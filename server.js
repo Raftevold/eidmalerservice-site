@@ -193,7 +193,9 @@ app.get('/robots.txt', (req, res) => {
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  const sider = ['', '/tjenester', '/prosjekter', '/om-oss', '/kontakt', '/personvern'];
+  // Bruk same form som canonical-lenkene (rot med skråstrek), slik at Google
+  // ikkje ser to variantar av framsida.
+  const sider = ['/', '/tjenester', '/prosjekter', '/om-oss', '/kontakt', '/personvern'];
   const dato = new Date().toISOString().slice(0, 10);
   res.type('application/xml').send(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
