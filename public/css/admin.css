@@ -326,3 +326,85 @@
 }
 .ki-av { color: var(--dempa); font-size: .88rem; }
 .arbeider { opacity: .6; pointer-events: none; }
+
+/* ---------- linjeveljar, forbehold og oppsett ---------- */
+
+.linjeveljar {
+  display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 5px;
+  padding: .7rem .9rem; margin-bottom: 1rem;
+}
+.linjeveljar label {
+  margin: 0; font-size: .78rem; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--gull); white-space: nowrap;
+}
+.linjeveljar select {
+  flex: 1 1 20rem; min-width: 0;
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 4px;
+  color: var(--kritt); font: inherit; font-size: .93rem; padding: .5rem .6rem;
+}
+.linjeveljar select:focus { border-color: var(--gull); }
+.linjeveljar select:disabled { color: var(--dempa); cursor: not-allowed; }
+
+.kryss {
+  display: flex; align-items: flex-start; gap: .6rem; margin: 0;
+  cursor: pointer; font-size: .92rem; line-height: 1.45; color: var(--kritt);
+}
+.kryss input { width: 1.05rem; height: 1.05rem; margin-top: .18rem; flex: none; accent-color: var(--gull); cursor: pointer; }
+.kryss span:empty { display: none; }
+
+.atterhald { margin-top: 1.4rem; border-top: 1px solid var(--linje); padding-top: 1.2rem; }
+.atterhald__topp { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.atterhald__topp h3 { margin: 0; font-size: 1.05rem; }
+.atterhald__topp .miniknapp { margin-left: auto; }
+.atterhald__liste {
+  display: grid; gap: .7rem; margin-bottom: 1.1rem;
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 5px; padding: .95rem 1.1rem;
+}
+
+.katalograd {
+  display: grid; grid-template-columns: 4.5rem 1fr 6.5rem 2.6rem;
+  gap: .6rem; align-items: center; padding: .28rem 0;
+}
+.katalograd--hovud {
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gull);
+  border-bottom: 1px solid var(--linje); padding-bottom: .45rem; margin-bottom: .35rem;
+}
+.katalograd--hovud span { padding-left: .1rem; }
+/* Kryssruta har inga tekst i desse radene, så sjølve boksen ville vore heile
+   trykkflata. Labelen får høgd nok til å treffast med tommelen. */
+.katalograd .kryss, .atterhaldrad .kryss { justify-content: center; align-items: center; min-height: 2.75rem; }
+.katalograd input[type="text"], .katalograd select {
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 3px;
+  color: var(--kritt); font: inherit; font-size: .92rem; padding: .45rem .5rem; width: 100%;
+}
+.katalograd input[type="text"]:focus, .katalograd select:focus { border-color: var(--gull); }
+
+.atterhaldrad {
+  display: grid; grid-template-columns: 4.5rem 1fr 2.6rem;
+  gap: .6rem; align-items: start; padding: .35rem 0;
+  border-bottom: 1px solid var(--linje);
+}
+.atterhaldrad:last-child { border-bottom: 0; }
+.atterhaldrad textarea {
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 3px;
+  color: var(--kritt); font: inherit; font-size: .92rem; padding: .45rem .5rem;
+  width: 100%; min-height: 3.4rem; resize: vertical;
+}
+.atterhaldrad textarea:focus { border-color: var(--gull); }
+
+.boks--mal { border-left: 2px solid var(--gull-mørk); }
+.malrad { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.malnamn {
+  flex: 1 1 14rem; min-width: 0;
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 4px;
+  color: var(--gull-lys); font-family: var(--serif); font-size: 1.2rem;
+  padding: .45rem .6rem;
+}
+.malnamn:focus { border-color: var(--gull); }
+
+@media (max-width: 860px) {
+  .katalograd { grid-template-columns: 3rem 1fr 5.5rem 2.4rem; gap: .4rem; }
+  .atterhaldrad { grid-template-columns: 3rem 1fr 2.4rem; gap: .4rem; }
+  .linjeveljar select { flex-basis: 100%; }
+}

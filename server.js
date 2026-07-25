@@ -450,16 +450,41 @@ app.delete('/admin/api/bilete/:fil', auth.requireAdmin, async (req, res) => {
 
 app.get('/admin/api/tilbod', auth.requireAdmin, (req, res) => {
   const lager = store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] };
+  const oppsett = tilbodslib.flettOppsett(lager.oppsett);
   res.json({
     tilbod: lager.tilbod || [],
     prisbank: lager.prisbank || [],
-    malar: tilbodslib.MALAR,
+    oppsett,
+    // Malane ligg òg her flatt, slik at lista over tilbod kan slå opp jobbnamn
+    // utan å kjenne oppsettsstrukturen.
+    malar: oppsett.malar,
     einingar: tilbodslib.EININGAR,
-    standardAtterhald: tilbodslib.STANDARD_ATTERHALD,
     mvaSats: tilbodslib.MVA_SATS,
     kiPaa: tilbodslib.kiTilgjengeleg(),
     modell: tilbodslib.kiTilgjengeleg() ? tilbodslib.MODELL : null,
+    // Standarden, så admin kan tilbakestille utan å laste sida på nytt
+    standardOppsett: tilbodslib.standardOppsett(),
   });
+});
+
+// Malar, linjekatalog og atterhald. Blir lagra saman med tilboda, så alt
+// tilbodsverktøyet treng ligg i éi fil.
+app.put('/admin/api/tilbod/oppsett', auth.requireAdmin, async (req, res) => {
+  const inn = req.body;
+  if (!inn || typeof inn !== 'object') {
+    return res.status(400).json({ feil: 'Ugyldig oppsett' });
+  }
+  const reint = tilbodslib.normaliserOppsett(inn);
+  if (!reint.atterhald.length && !Object.keys(reint.malar).length) {
+    return res.status(400).json({ feil: 'Oppsettet var tomt. Legg inn minst éin mal eller eitt atterhald.' });
+  }
+  try {
+    await store.endraTilbod((lager) => { lager.oppsett = reint; });
+    res.json({ ok: true, oppsett: tilbodslib.flettOppsett(reint) });
+  } catch (e) {
+    console.error('Lagring av tilbodsoppsett feila:', e.message);
+    res.status(500).json({ feil: 'Klarte ikkje lagre: ' + e.message });
+  }
 });
 
 app.post('/admin/api/tilbod', auth.requireAdmin, async (req, res) => {
@@ -468,31 +493,36 @@ app.post('/admin/api/tilbod', auth.requireAdmin, async (req, res) => {
     return res.status(400).json({ feil: 'Ugyldig tilbod' });
   }
   try {
-    const lager = JSON.parse(JSON.stringify(store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] }));
-    const no = new Date().toISOString();
-    let t = (lager.tilbod || []).find((x) => x.nr === inn.nr);
-    if (!t) {
-      t = { nr: lager.teljar || 1000, opprettet: no };
-      lager.teljar = (lager.teljar || 1000) + 1;
-      lager.tilbod = lager.tilbod || [];
-      lager.tilbod.unshift(t);
-    }
-    Object.assign(t, {
-      status: ['kladd', 'sendt', 'akseptert', 'avslatt'].includes(inn.status) ? inn.status : 'kladd',
-      oppdatert: no,
-      kunde: inn.kunde || {},
-      jobb: inn.jobb || {},
-      linjer: inn.linjer,
-      mvaSats: Number(inn.mvaSats) || tilbodslib.MVA_SATS,
-      gyldigDagar: Number(inn.gyldigDagar) || 30,
-      atterhald: Array.isArray(inn.atterhald) ? inn.atterhald : tilbodslib.STANDARD_ATTERHALD,
-      utfall: inn.utfall || {},
+    const svar = await store.endraTilbod((lager) => {
+      const no = new Date().toISOString();
+      const standardAtterhald = tilbodslib.flettOppsett(lager.oppsett).atterhald
+        .filter((a) => a.standard).map((a) => a.tekst);
+      let t = (lager.tilbod || []).find((x) => x.nr === inn.nr);
+      if (!t) {
+        t = { nr: lager.teljar || 1000, opprettet: no };
+        lager.teljar = (lager.teljar || 1000) + 1;
+        lager.tilbod = lager.tilbod || [];
+        lager.tilbod.unshift(t);
+      }
+      Object.assign(t, {
+        status: ['kladd', 'sendt', 'akseptert', 'avslatt'].includes(inn.status) ? inn.status : 'kladd',
+        oppdatert: no,
+        kunde: inn.kunde || {},
+        jobb: inn.jobb || {},
+        linjer: inn.linjer,
+        mvaSats: Number(inn.mvaSats) || tilbodslib.MVA_SATS,
+        gyldigDagar: Number(inn.gyldigDagar) || 30,
+        atterhald: Array.isArray(inn.atterhald)
+          ? inn.atterhald.map((a) => String(a).slice(0, 500)).filter(Boolean).slice(0, 40)
+          : standardAtterhald,
+        utfall: inn.utfall || {},
+      });
+      // Kvar lagring gjer prisbanken litt betre for neste gong
+      lager.prisbank = tilbodslib.oppdaterPrisbank(lager.prisbank, inn.linjer);
+      lager.tilbod = lager.tilbod.slice(0, 500);
+      return { nr: t.nr, prisbank: lager.prisbank };
     });
-    // Kvar lagring gjer prisbanken litt betre for neste gong
-    lager.prisbank = tilbodslib.oppdaterPrisbank(lager.prisbank, inn.linjer);
-    lager.tilbod = lager.tilbod.slice(0, 500);
-    await store.saveTilbod(lager);
-    res.json({ ok: true, nr: t.nr, prisbank: lager.prisbank });
+    res.json({ ok: true, nr: svar.nr, prisbank: svar.prisbank });
   } catch (e) {
     console.error('Lagring av tilbod feila:', e.message);
     res.status(500).json({ feil: 'Klarte ikkje lagre: ' + e.message });
@@ -501,9 +531,9 @@ app.post('/admin/api/tilbod', auth.requireAdmin, async (req, res) => {
 
 app.delete('/admin/api/tilbod/:nr', auth.requireAdmin, async (req, res) => {
   try {
-    const lager = JSON.parse(JSON.stringify(store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] }));
-    lager.tilbod = (lager.tilbod || []).filter((t) => String(t.nr) !== String(req.params.nr));
-    await store.saveTilbod(lager);
+    await store.endraTilbod((lager) => {
+      lager.tilbod = (lager.tilbod || []).filter((t) => String(t.nr) !== String(req.params.nr));
+    });
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ feil: e.message });
@@ -523,6 +553,7 @@ app.post('/admin/api/tilbod/ki', auth.requireAdmin, async (req, res) => {
       jobb,
       prisbank: lager.prisbank,
       tidlegare: lager.tilbod,
+      oppsett: tilbodslib.flettOppsett(lager.oppsett),
     });
     res.json(utkast);
   } catch (e) {
@@ -575,7 +606,25 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('Uventa feil:', err);
-  res.status(500).send('Det skjedde ein feil. Prøv igjen seinare.');
+
+  // Feil frå body-parseren har eigne kodar. Utan dette blir «for stor fil» og
+  // «ugyldig JSON» til eit generelt 500, og den som redigerer får ikkje vite
+  // kva som eigentleg gjekk gale.
+  let status = 500;
+  let melding = 'Det skjedde ein feil. Prøv igjen seinare.';
+  if (err && err.type === 'entity.too.large') {
+    status = 413;
+    melding = 'Innhaldet var for stort til å sendast. Del det opp i mindre endringar.';
+  } else if (err && (err.type === 'entity.parse.failed' || err instanceof SyntaxError)) {
+    status = 400;
+    melding = 'Data lét seg ikkje lese. Last sida på nytt og prøv igjen.';
+  }
+
+  // Admin-grensesnittet ventar JSON og ville elles fått ei HTML-side i fanget.
+  if (req.path.startsWith('/admin/api/')) {
+    return res.status(status).json({ feil: melding });
+  }
+  res.status(status).send(melding);
 });
 
 // ---------- oppstart ----------

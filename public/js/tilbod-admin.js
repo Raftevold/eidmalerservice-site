@@ -5,9 +5,10 @@
 (function () {
   'use strict';
 
-  var data = null;           // { tilbod, prisbank, malar, einingar, ... }
+  var data = null;           // { tilbod, prisbank, oppsett, einingar, ... }
   var aktivt = null;         // tilbodet som er ope for redigering
-  var lyttar = null;         // funksjon som teiknar fana på nytt
+  var visning = 'liste';     // 'liste' eller 'oppsett'
+  var oppsettKladd = null;   // arbeidskopi av oppsettet medan det blir redigert
 
   function lag(tag, klasse, tekst) {
     var el = document.createElement(tag);
@@ -90,6 +91,82 @@
     return b;
   }
 
+  function kryssrute(etikett, avkryssa, vedEndring) {
+    var l = lag('label', 'kryss');
+    var i = lag('input');
+    i.type = 'checkbox';
+    i.checked = Boolean(avkryssa);
+    i.addEventListener('change', function () { vedEndring(i.checked); });
+    l.appendChild(i);
+    l.appendChild(lag('span', null, etikett));
+    return l;
+  }
+
+  function einingsveljar(verdi, vedEndring) {
+    var s = lag('select');
+    (data.einingar || ['stk']).forEach(function (e) {
+      var o = lag('option', null, e);
+      o.value = e;
+      if (verdi === e) o.selected = true;
+      s.appendChild(o);
+    });
+    s.addEventListener('change', function () { vedEndring(s.value); });
+    return s;
+  }
+
+  /* ---------- linjekatalogen ---------- */
+
+  function nokkel(tekst) {
+    return String(tekst == null ? '' : tekst).toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  function oppsettet() {
+    return (data && data.oppsett) || { atterhald: [], felles: [], malar: {} };
+  }
+
+  // Prisen bedrifta brukte sist på ei linje med same tekst og eining.
+  function prisFor(tekst, eining) {
+    var n = nokkel(tekst);
+    var treff = (data.prisbank || []).find(function (p) {
+      return nokkel(p.tekst) === n && p.eining === eining;
+    });
+    return treff ? treff.einingspris : 0;
+  }
+
+  // Alle linjene som skal liggje i veljaren for ein jobbtype, gruppert slik dei
+  // blir viste: malen sine først, så fellslinjene, så alt prisbanken har lært
+  // som ikkje alt står i dei to første gruppene.
+  function katalog(jobbtype) {
+    var o = oppsettet();
+    var mal = o.malar && o.malar[jobbtype];
+    var grupper = [];
+    if (mal && mal.linjer.length) grupper.push({ namn: mal.namn, linjer: mal.linjer });
+    if ((o.felles || []).length) grupper.push({ namn: 'Gjelder alle jobber', linjer: o.felles });
+
+    var kjende = {};
+    grupper.forEach(function (g) {
+      g.linjer.forEach(function (l) { kjende[nokkel(l.tekst) + '|' + l.eining] = true; });
+    });
+    var frå = (data.prisbank || []).filter(function (p) {
+      return !kjende[nokkel(p.tekst) + '|' + p.eining];
+    });
+    if (frå.length) grupper.push({ namn: 'Fra prisbanken', linjer: frå.slice(0, 60) });
+    return grupper;
+  }
+
+  // Same regel som på serveren: malen sine standardlinjer, så fellslinjene som
+  // er merkte standard.
+  function standardlinjer(jobbtype) {
+    var o = oppsettet();
+    var mal = o.malar && o.malar[jobbtype];
+    if (!mal) return [];
+    return mal.linjer.concat(o.felles || [])
+      .filter(function (l) { return l.standard; })
+      .map(function (l) {
+        return { tekst: l.tekst, eining: l.eining, mengd: 0, einingspris: prisFor(l.tekst, l.eining) };
+      });
+  }
+
   /* ---------- lista over tilbod ---------- */
 
   function tegnListe(ut, hjelp) {
@@ -98,6 +175,12 @@
     d.appendChild(lag('p', 'adm__leiing',
       'Lag tilbud til kundene, skriv dem ut som PDF, og hold oversikt over hva som er sendt og akseptert. '
       + 'Hver pris dere lagrer havner i prisbanken, slik at neste tilbud går raskere.'));
+
+    var handlingar = lag('div', 'tilbod-topp');
+    handlingar.appendChild(knapp('Oppsett: maler og forbehold', 'miniknapp', function () {
+      opneOppsett(hjelp);
+    }));
+    d.appendChild(handlingar);
 
     var metodar = lag('div', 'metodekort');
 
@@ -216,7 +299,9 @@
       linjer: [],
       mvaSats: data.mvaSats,
       gyldigDagar: 30,
-      atterhald: (data.standardAtterhald || []).slice(),
+      atterhald: (oppsettet().atterhald || [])
+        .filter(function (a) { return a.standard; })
+        .map(function (a) { return a.tekst; }),
       utfall: {},
       _metode: metode,
     };
@@ -300,16 +385,10 @@
           + 'Den foreslår linjer — dere retter og godkjenner før noe sendes. Kundens navn sendes aldri med.'));
         bm.appendChild(knapp('Lag utkast', 'knapp knapp--liten', function () { kiUtkast(bm, hjelp); }));
       } else {
-        bm.appendChild(lag('p', 'boks__hjelp', 'Setter inn standardlinjene for jobbtypen, med prisene dere brukte sist.'));
+        bm.appendChild(lag('p', 'boks__hjelp', 'Setter inn standardlinjene for jobbtypen, med prisene dere brukte sist. Resten av linjene i katalogen ligger i velgeren over tabellen.'));
         bm.appendChild(knapp('Hent standardlinjer', 'knapp knapp--liten', function () {
           if (!t.jobb.type) { alert('Velg jobbtype først.'); return; }
-          var mal = data.malar[t.jobb.type];
-          t.linjer = mal.linjer.map(function (l) {
-            var treff = (data.prisbank || []).find(function (p) {
-              return p.tekst.toLowerCase() === l.tekst.toLowerCase() && p.eining === l.eining;
-            });
-            return { tekst: l.tekst, eining: l.eining, mengd: 0, einingspris: treff ? treff.einingspris : 0 };
-          });
+          t.linjer = standardlinjer(t.jobb.type);
           hjelp.tegn();
         }));
       }
@@ -318,13 +397,75 @@
 
     // Linjer
     var bl = boks('Varelinjer');
-    bl._topp.appendChild(knapp('+ Ny linje', 'knapp knapp--liten', function () {
+    bl._topp.appendChild(knapp('+ Tom linje', 'knapp knapp--liten', function () {
       t.linjer.push({ tekst: '', eining: 'm2', mengd: 0, einingspris: 0 });
       hjelp.tegn();
     }));
 
+    // Veljar med vanlege linjer for jobbtypen. Prisen kjem frå prisbanken, så
+    // ei linje du har brukt før kjem inn ferdig prisa.
+    var grupper = katalog(t.jobb.type);
+    var veljarrad = lag('div', 'linjeveljar');
+    var vlab = lag('label', null, 'Legg til vanlig linje');
+    var vid = 'linjeveljar-' + Math.random().toString(36).slice(2, 8);
+    vlab.setAttribute('for', vid);
+    veljarrad.appendChild(vlab);
+
+    var vsel = lag('select');
+    vsel.id = vid;
+    var tom = lag('option', null, grupper.length ? 'Velg en linje …' : 'Velg jobbtype for å få forslag');
+    tom.value = '';
+    vsel.appendChild(tom);
+    var oppslag = {};
+    grupper.forEach(function (g, gi) {
+      var og = lag('optgroup');
+      og.label = g.namn;
+      g.linjer.forEach(function (l, li) {
+        var id = gi + ':' + li;
+        oppslag[id] = l;
+        var pris = prisFor(l.tekst, l.eining);
+        var o = lag('option', null, l.tekst + '  ·  ' + l.eining + (pris ? '  ·  ' + kr(pris) + ' kr' : ''));
+        o.value = id;
+        og.appendChild(o);
+      });
+      vsel.appendChild(og);
+    });
+    if (!grupper.length) vsel.disabled = true;
+    vsel.addEventListener('change', function () {
+      var l = oppslag[vsel.value];
+      vsel.value = '';
+      if (!l) return;
+      t.linjer.push({
+        tekst: l.tekst,
+        eining: l.eining,
+        mengd: 0,
+        einingspris: l.einingspris != null ? l.einingspris : prisFor(l.tekst, l.eining),
+      });
+      hjelp.tegn();
+    });
+    veljarrad.appendChild(vsel);
+    veljarrad.appendChild(knapp('Rediger listen', 'miniknapp', function () {
+      opneOppsett(hjelp);
+    }));
+    bl.appendChild(veljarrad);
+
+    // Forslag medan ein skriv rett i skildringsfeltet
+    var dl = lag('datalist');
+    dl.id = 'linjeforslag';
+    var sett = {};
+    grupper.forEach(function (g) {
+      g.linjer.forEach(function (l) {
+        if (sett[nokkel(l.tekst)]) return;
+        sett[nokkel(l.tekst)] = true;
+        var o = lag('option');
+        o.value = l.tekst;
+        dl.appendChild(o);
+      });
+    });
+    bl.appendChild(dl);
+
     if (!t.linjer.length) {
-      bl.appendChild(lag('p', 'tom-melding', 'Ingen linjer ennå. Legg til en linje, hent en mal, eller lag et KI-utkast.'));
+      bl.appendChild(lag('p', 'tom-melding', 'Ingen linjer ennå. Velg en vanlig linje over, legg til en tom linje, eller lag et KI-utkast.'));
     } else {
       var tab = lag('table', 'linjetabell');
       var thead = lag('thead');
@@ -338,11 +479,30 @@
       t.linjer.forEach(function (l, i) {
         var tr = lag('tr');
 
+        var iPris, sEining;
+
         var tdTekst = lag('td');
         var iTekst = lag('input');
         iTekst.type = 'text';
+        iTekst.setAttribute('list', 'linjeforslag');
         iTekst.value = l.tekst || '';
-        iTekst.addEventListener('input', function () { l.tekst = iTekst.value; });
+        iTekst.addEventListener('input', function () {
+          l.tekst = iTekst.value;
+          // Treff på ei kjend linje fyller inn eining og pris - men berre så
+          // lenge feltet står urørt, så vi aldri overskriv ein pris nokon har sett.
+          if (l.mengd || l.einingspris) return;
+          var n = nokkel(iTekst.value);
+          var treff = null;
+          katalog(t.jobb.type).forEach(function (g) {
+            g.linjer.forEach(function (k) { if (!treff && nokkel(k.tekst) === n) treff = k; });
+          });
+          if (!treff) return;
+          l.eining = treff.eining;
+          l.einingspris = treff.einingspris != null ? treff.einingspris : prisFor(treff.tekst, treff.eining);
+          if (sEining) sEining.value = l.eining;
+          if (iPris) iPris.value = l.einingspris;
+          oppdaterSum(t);
+        });
         tdTekst.appendChild(iTekst);
         tr.appendChild(tdTekst);
 
@@ -359,7 +519,7 @@
         tr.appendChild(tdMengd);
 
         var tdEining = lag('td', 'kol-eining');
-        var sEining = lag('select');
+        sEining = lag('select');
         (data.einingar || []).forEach(function (e) {
           var o = lag('option', null, e);
           o.value = e;
@@ -371,7 +531,7 @@
         tr.appendChild(tdEining);
 
         var tdPris = lag('td', 'kol-pris');
-        var iPris = lag('input');
+        iPris = lag('input');
         iPris.type = 'number';
         iPris.step = 'any';
         iPris.value = l.einingspris || 0;
@@ -437,16 +597,62 @@
     }
     bv.appendChild(r3);
 
-    var atterhaldTekst = { verdi: (t.atterhald || []).join('\n') };
-    var fa = felt('Forbehold (én per linje)', atterhaldTekst, 'verdi', 'tekstomrade');
-    fa.querySelector('textarea').addEventListener('input', function (e) {
-      t.atterhald = e.target.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
-    });
-    bv.appendChild(fa);
+    bv.appendChild(tegnAtterhald(t, hjelp));
     d.appendChild(bv);
 
     ut.appendChild(d);
     oppdaterSum(t);
+  }
+
+  /* ---------- forbehold ---------- */
+
+  // Forbeholda i oppsettet blir kryssa av, resten skriv ein sjølv. Gamle tilbod
+  // med forbehold som ikkje lenger står i lista mistar dei ikkje - dei dukkar
+  // opp i «egne forbehold» og blir med vidare.
+  function tegnAtterhald(t, hjelp) {
+    var wrap = lag('div', 'atterhald');
+    var liste = oppsettet().atterhald || [];
+    var kjende = {};
+    liste.forEach(function (a) { kjende[nokkel(a.tekst)] = true; });
+
+    var valde = {};
+    (t.atterhald || []).forEach(function (x) { valde[nokkel(x)] = true; });
+    var eigne = (t.atterhald || []).filter(function (x) { return !kjende[nokkel(x)]; });
+
+    function skrivTilbake() {
+      var ut = liste.filter(function (a) { return valde[nokkel(a.tekst)]; })
+        .map(function (a) { return a.tekst; });
+      t.atterhald = ut.concat(eigne);
+    }
+
+    var topp = lag('div', 'atterhald__topp');
+    topp.appendChild(lag('h3', null, 'Forbehold'));
+    topp.appendChild(knapp('Rediger listen', 'miniknapp', function () { opneOppsett(hjelp); }));
+    wrap.appendChild(topp);
+    wrap.appendChild(lag('p', 'boks__hjelp', 'Kryss av det som gjelder denne jobben. Det som er krysset av havner nederst på tilbudsdokumentet.'));
+
+    if (!liste.length) {
+      wrap.appendChild(lag('p', 'tom-melding', 'Ingen forbehold satt opp ennå. Trykk «Rediger listen» for å legge inn de dere bruker.'));
+    } else {
+      var rutene = lag('div', 'atterhald__liste');
+      liste.forEach(function (a) {
+        rutene.appendChild(kryssrute(a.tekst, valde[nokkel(a.tekst)], function (paa) {
+          valde[nokkel(a.tekst)] = paa;
+          skrivTilbake();
+        }));
+      });
+      wrap.appendChild(rutene);
+    }
+
+    var eigetObj = { verdi: eigne.join('\n') };
+    var fe = felt('Egne forbehold for denne jobben (én per linje)', eigetObj, 'verdi', 'tekstomrade');
+    fe.querySelector('textarea').addEventListener('input', function (e) {
+      eigne = e.target.value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      skrivTilbake();
+    });
+    wrap.appendChild(fe);
+
+    return wrap;
   }
 
   function oppdaterSum(t) {
@@ -467,6 +673,231 @@
     boksEl.appendChild(rad('Sum eks. mva.', kr(s.netto) + ' kr'));
     boksEl.appendChild(rad('Mva. ' + s.sats + ' %', kr(s.mva) + ' kr'));
     boksEl.appendChild(rad('Å betale', kr(s.brutto) + ' kr', 'sumrad--total'));
+  }
+
+  /* ---------- oppsett: malar, linjekatalog og forbehold ---------- */
+
+  // Går ein til oppsettet midt i eit tilbod, blir tilbodet parkert slik det står.
+  // Ulagra endringar overlever turen - vi legg objektet til side, ikkje på disk.
+  var parkert = null;
+
+  function opneOppsett(hjelp) {
+    oppsettKladd = JSON.parse(JSON.stringify(oppsettet()));
+    parkert = aktivt;
+    aktivt = null;
+    visning = 'oppsett';
+    hjelp.tegn();
+  }
+
+  function lukkOppsett(hjelp) {
+    visning = 'liste';
+    oppsettKladd = null;
+    aktivt = parkert;
+    parkert = null;
+    hjelp.tegn();
+  }
+
+  function slugg(namn, brukte) {
+    var rot = String(namn || '').toLowerCase()
+      .replace(/æ/g, 'ae').replace(/ø/g, 'oe').replace(/å/g, 'aa')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'mal';
+    var n = rot, i = 2;
+    while (brukte[n]) { n = rot.slice(0, 37) + '-' + i; i += 1; }
+    return n;
+  }
+
+  // Éi redigerbar linje i katalogen: standard-kryss, tekst, eining, slett.
+  function katalograd(l, liste, i, hjelp) {
+    var rad = lag('div', 'katalograd');
+
+    rad.appendChild(kryssrute('', l.standard, function (paa) { l.standard = paa; }));
+
+    var iTekst = lag('input');
+    iTekst.type = 'text';
+    iTekst.value = l.tekst || '';
+    iTekst.setAttribute('aria-label', 'Beskrivelse');
+    iTekst.addEventListener('input', function () { l.tekst = iTekst.value; });
+    rad.appendChild(iTekst);
+
+    rad.appendChild(einingsveljar(l.eining, function (v) { l.eining = v; }));
+
+    rad.appendChild(knapp('×', 'miniknapp miniknapp--fare', function () {
+      liste.splice(i, 1);
+      hjelp.tegn();
+    }));
+    return rad;
+  }
+
+  function katalogboks(tittel, liste, hjelp, hjelpetekst) {
+    var b = boks(tittel);
+    b._topp.appendChild(knapp('+ Ny linje', 'miniknapp', function () {
+      liste.push({ tekst: '', eining: 'm2', standard: false });
+      hjelp.tegn();
+    }));
+    if (hjelpetekst) b.appendChild(lag('p', 'boks__hjelp', hjelpetekst));
+
+    var hovud = lag('div', 'katalograd katalograd--hovud');
+    hovud.appendChild(lag('span', null, 'Standard'));
+    hovud.appendChild(lag('span', null, 'Beskrivelse'));
+    hovud.appendChild(lag('span', null, 'Enhet'));
+    hovud.appendChild(lag('span', null, ''));
+    b.appendChild(hovud);
+
+    if (!liste.length) {
+      b.appendChild(lag('p', 'tom-melding', 'Ingen linjer ennå.'));
+    } else {
+      liste.forEach(function (l, i) { b.appendChild(katalograd(l, liste, i, hjelp)); });
+    }
+    return b;
+  }
+
+  function tegnOppsett(ut, hjelp) {
+    var o = oppsettKladd;
+    var d = lag('div', 'adm__seksjon');
+
+    d.appendChild(lag('h1', null, 'Oppsett for tilbud'));
+    d.appendChild(lag('p', 'adm__leiing',
+      'Her styrer dere hva som ligger klart når dere lager et tilbud: forbeholdene dere krysser av, '
+      + 'og de vanlige linjene for hver type jobb. Endringer gjelder nye tilbud — tilbud dere alt har laget står som de er.'));
+
+    var topp = lag('div', 'tilbod-topp');
+    topp.appendChild(knapp(parkert ? '← Tilbake til tilbudet' : '← Tilbake til tilbud', 'miniknapp', function () {
+      lukkOppsett(hjelp);
+    }));
+    topp.appendChild(knapp('Lagre oppsett', 'knapp knapp--liten', function () { lagreOppsett(hjelp); }));
+    topp.appendChild(knapp('Tilbakestill til standard', 'miniknapp', function () {
+      if (!confirm('Erstatte hele oppsettet med standardlistene? Endringene deres forsvinner.')) return;
+      oppsettKladd = JSON.parse(JSON.stringify(data.standardOppsett));
+      hjelp.tegn();
+    }));
+    d.appendChild(topp);
+
+    // Forbehold
+    var bf = boks('Forbehold');
+    bf._topp.appendChild(knapp('+ Nytt forbehold', 'miniknapp', function () {
+      o.atterhald.push({ tekst: '', standard: false });
+      hjelp.tegn();
+    }));
+    bf.appendChild(lag('p', 'boks__hjelp',
+      'Kryss av «standard» for de forbeholdene som skal være ferdig avkrysset på nye tilbud. '
+      + 'Resten ligger klare i listen, men må hakes av når de trengs.'));
+    if (!o.atterhald.length) {
+      bf.appendChild(lag('p', 'tom-melding', 'Ingen forbehold ennå.'));
+    } else {
+      o.atterhald.forEach(function (a, i) {
+        var rad = lag('div', 'atterhaldrad');
+        rad.appendChild(kryssrute('', a.standard, function (paa) { a.standard = paa; }));
+        var ta = lag('textarea');
+        ta.rows = 2;
+        ta.value = a.tekst || '';
+        ta.setAttribute('aria-label', 'Forbehold ' + (i + 1));
+        ta.addEventListener('input', function () { a.tekst = ta.value; });
+        rad.appendChild(ta);
+        rad.appendChild(knapp('×', 'miniknapp miniknapp--fare', function () {
+          o.atterhald.splice(i, 1);
+          hjelp.tegn();
+        }));
+        bf.appendChild(rad);
+      });
+    }
+    d.appendChild(bf);
+
+    // Fellslinjer
+    d.appendChild(katalogboks('Linjer som gjelder alle jobber', o.felles, hjelp,
+      'Rigg, kjøring, stillas og andre linjer som kan komme på hvilken som helst jobb. '
+      + 'De ligger i velgeren uansett jobbtype. Er de merket «standard», kommer de også med når dere henter standardlinjer.'));
+
+    // Malar per jobbtype
+    var noklar = Object.keys(o.malar);
+    var bm = boks('Jobbtyper og linjekatalog');
+    bm._topp.appendChild(knapp('+ Ny jobbtype', 'miniknapp', function () {
+      var brukte = {};
+      Object.keys(o.malar).forEach(function (k) { brukte[k] = true; });
+      o.malar[slugg('ny jobbtype', brukte)] = { namn: 'Ny jobbtype', linjer: [] };
+      hjelp.tegn();
+    }));
+    bm.appendChild(lag('p', 'boks__hjelp',
+      'Jobbtypene er det dere velger øverst på et tilbud. Linjene under hver av dem fyller velgeren i tilbudsskjemaet. '
+      + 'Merk med «standard» de linjene som skal settes inn når dere trykker «Hent standardlinjer».'));
+    d.appendChild(bm);
+
+    if (!noklar.length) {
+      d.appendChild(lag('p', 'tom-melding', 'Ingen jobbtyper ennå. Legg til en over.'));
+    }
+
+    noklar.forEach(function (k) {
+      var m = o.malar[k];
+      var b = boks(null, 'boks--mal');
+      var topprad = lag('div', 'malrad');
+      var iNamn = lag('input');
+      iNamn.type = 'text';
+      iNamn.className = 'malnamn';
+      iNamn.value = m.namn || '';
+      iNamn.setAttribute('aria-label', 'Navn på jobbtype');
+      iNamn.addEventListener('input', function () { m.namn = iNamn.value; });
+      topprad.appendChild(iNamn);
+      topprad.appendChild(knapp('+ Ny linje', 'miniknapp', function () {
+        m.linjer.push({ tekst: '', eining: 'm2', standard: false });
+        hjelp.tegn();
+      }));
+      topprad.appendChild(knapp('Slett jobbtypen', 'miniknapp miniknapp--fare', function () {
+        var brukt = (data.tilbod || []).filter(function (t) { return t.jobb && t.jobb.type === k; }).length;
+        var tekst = brukt
+          ? 'Slette «' + (m.namn || k) + '»? ' + brukt + ' tilbud bruker denne jobbtypen. De blir stående, men mister navnet på jobbtypen.'
+          : 'Slette «' + (m.namn || k) + '» med alle linjene?';
+        if (!confirm(tekst)) return;
+        delete o.malar[k];
+        hjelp.tegn();
+      }));
+      b.appendChild(topprad);
+
+      var hovud = lag('div', 'katalograd katalograd--hovud');
+      hovud.appendChild(lag('span', null, 'Standard'));
+      hovud.appendChild(lag('span', null, 'Beskrivelse'));
+      hovud.appendChild(lag('span', null, 'Enhet'));
+      hovud.appendChild(lag('span', null, ''));
+      b.appendChild(hovud);
+
+      if (!m.linjer.length) {
+        b.appendChild(lag('p', 'tom-melding', 'Ingen linjer ennå.'));
+      } else {
+        m.linjer.forEach(function (l, i) { b.appendChild(katalograd(l, m.linjer, i, hjelp)); });
+      }
+      d.appendChild(b);
+    });
+
+    var botn = lag('div', 'tilbod-topp');
+    botn.appendChild(knapp('Lagre oppsett', 'knapp knapp--liten', function () { lagreOppsett(hjelp); }));
+    d.appendChild(botn);
+
+    ut.appendChild(d);
+  }
+
+  function lagreOppsett(hjelp) {
+    var tomme = (oppsettKladd.atterhald || []).filter(function (a) { return !String(a.tekst || '').trim(); }).length;
+    Object.keys(oppsettKladd.malar).forEach(function (k) {
+      tomme += oppsettKladd.malar[k].linjer.filter(function (l) { return !String(l.tekst || '').trim(); }).length;
+    });
+    tomme += (oppsettKladd.felles || []).filter(function (l) { return !String(l.tekst || '').trim(); }).length;
+    if (tomme && !confirm(tomme + ' rad(er) står uten tekst og blir forkastet. Lagre likevel?')) return;
+
+    hjelp.status('Lagrer oppsett …');
+    hjelp.hent('/admin/api/tilbod/oppsett', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(oppsettKladd),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (svar) {
+        if (svar.feil) throw new Error(svar.feil);
+        hjelp.status('Oppsettet er lagret ✓');
+        return lastData();
+      })
+      .then(function () {
+        oppsettKladd = JSON.parse(JSON.stringify(oppsettet()));
+        hjelp.tegn();
+      })
+      .catch(function (e) { hjelp.status('Kunne ikke lagre: ' + e.message, true); });
   }
 
   /* ---------- KI ---------- */
@@ -551,6 +982,7 @@
         return;
       }
       if (aktivt) tegnSkjema(ut, hjelp);
+      else if (visning === 'oppsett' && oppsettKladd) tegnOppsett(ut, hjelp);
       else tegnListe(ut, hjelp);
     },
     tal: function () {
