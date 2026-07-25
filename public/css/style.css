@@ -429,7 +429,8 @@ a:hover { color: var(--kritt); }
   font-size: .86rem; color: var(--dempa);
 }
 .botn__nede p { margin: 0; }
-.botn__demo { color: var(--gull-mørk); }
+/* --gull-mørk gav berre 3,78:1 mot botnfargen. --gull gir 7,5:1 og oppfyller WCAG AA. */
+.botn__demo { color: var(--gull); }
 
 /* ---------- mobil kontaktlinje ---------- */
 

@@ -1,0 +1,34 @@
+# Render Blueprint – Eid Malerservice AS
+# Webteneste på gratisplan. Løyndomar (ADMIN_PASSWORD_HASH, SESSION_SECRET,
+# GITHUB_TOKEN) har sync:false og blir sette i Render-dashbordet – aldri her.
+services:
+  - type: web
+    name: eidmalerservice
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24.18.0
+      - key: NODE_ENV
+        value: production
+      # 1 = noindex på alle sider (demo). Sett til 0 når bedrifta har godkjent sida.
+      - key: DEMO_NOINDEX
+        value: "1"
+      - key: GH_OWNER
+        value: Raftevold
+      - key: GH_REPO
+        value: eidmalerservice-site
+      - key: GH_DATA_BRANCH
+        value: data
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: BASE_URL
+        sync: false
