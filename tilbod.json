@@ -1,0 +1,55 @@
+{
+  "teljar": 1001,
+  "prisbank": [
+    {
+      "tekst": "riving av gammelt gulv",
+      "eining": "m2",
+      "einingspris": 100,
+      "tal": 1,
+      "sist": "2026-07-25T07:59:45.935Z"
+    }
+  ],
+  "tilbod": [
+    {
+      "nr": 1000,
+      "opprettet": "2026-07-25T07:59:45.935Z",
+      "status": "kladd",
+      "oppdatert": "2026-07-25T07:59:45.935Z",
+      "kunde": {
+        "navn": "",
+        "adresse": "",
+        "postnr": "",
+        "poststed": "",
+        "epost": "",
+        "telefon": ""
+      },
+      "jobb": {
+        "type": "gulvlegging",
+        "bygningstype": "enebolig",
+        "areal": 50,
+        "romtal": 2,
+        "tilstand": "god",
+        "tilkomst": "enkel",
+        "notat": ""
+      },
+      "linjer": [
+        {
+          "tekst": "riving av gammelt gulv",
+          "eining": "m2",
+          "mengd": 50,
+          "einingspris": 100
+        }
+      ],
+      "mvaSats": 25,
+      "gyldigDagar": 30,
+      "atterhald": [
+        "Prisen forutsetter at arbeidsstedet er ryddet og tilgjengelig når vi starter.",
+        "Skjulte skader (råte, fukt, sopp) som først viser seg under arbeidet er ikke med i prisen. Vi varsler før vi utfører slikt arbeid.",
+        "Dersom underlaget krever flere strøk enn forutsatt, avtales dette før arbeidet fortsetter.",
+        "Prisen gjelder i 30 dager fra tilbudsdato.",
+        "Strøm og vann på arbeidsstedet stilles til disposisjon av kunden."
+      ],
+      "utfall": {}
+    }
+  ]
+}
