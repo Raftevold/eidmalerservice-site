@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140">
+        <span class="stikk">Kontakt</span>
+        <h1><%= c.kontakt.tittel %></h1>
+        <p><%= c.kontakt.ingress %></p>
+      </div>
+
+      <div class="kontakt-rutenett">
+        <div id="skjema">
+          <% if (sendt) { %>
+            <div class="melding-boks melding-boks--ok" role="status">
+              <strong>Meldingen er sendt.</strong> <%= c.kontakt.takketekst %>
+            </div>
+          <% } %>
+          <% if (feil) { %>
+            <div class="melding-boks melding-boks--feil" role="alert">
+              <strong>Noe manglet.</strong> Fyll inn navn, en melding og enten e-post eller telefon, og prøv igjen.
+            </div>
+          <% } %>
+
+          <form class="skjema" method="post" action="/kontakt" novalidate>
+            <div class="felt">
+              <label for="navn">Navn <span class="hint">(påkrevd)</span></label>
+              <input type="text" id="navn" name="navn" autocomplete="name" required maxlength="120">
+            </div>
+
+            <div class="felt">
+              <label for="epost">E-post</label>
+              <input type="email" id="epost" name="epost" autocomplete="email" maxlength="160">
+            </div>
+
+            <div class="felt">
+              <label for="telefon">Telefon</label>
+              <input type="tel" id="telefon" name="telefon" autocomplete="tel" maxlength="40">
+              <span class="hint">Fyll inn e-post eller telefon, så vi får svart deg.</span>
+            </div>
+
+            <div class="felt">
+              <label for="tjeneste">Hva gjelder det?</label>
+              <select id="tjeneste" name="tjeneste">
+                <option value="">Velg gjerne en tjeneste</option>
+                <% (c.tjenester || []).forEach(function (t) { %>
+                  <option value="<%= t.navn %>"><%= t.navn %></option>
+                <% }); %>
+                <option value="Annet">Annet</option>
+              </select>
+            </div>
+
+            <div class="felt">
+              <label for="melding">Melding <span class="hint">(påkrevd)</span></label>
+              <textarea id="melding" name="melding" required maxlength="4000"
+                        placeholder="Fortell kort om jobben – hva slags rom eller bygg, omtrentlig størrelse, og når du tenker det passer."></textarea>
+            </div>
+
+            <div class="felt felt--skjult" aria-hidden="true">
+              <label for="nettside">La dette feltet stå tomt</label>
+              <input type="text" id="nettside" name="nettside" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div>
+              <button class="knapp" type="submit">Send henvendelse</button>
+            </div>
+            <p class="hint t-dempa">
+              Vi bruker opplysningene kun til å svare deg. Les mer i <a href="/personvern">personvernerklæringen</a>.
+            </p>
+          </form>
+        </div>
+
+        <aside class="info-kort avslor">
+          <h2>Kontaktinformasjon</h2>
+          <ul class="info-liste">
+            <li>
+              <span class="etikett">Telefon</span>
+              <a href="<%= telefonLenke(c.bedrift.telefon) %>"><%= c.bedrift.telefon %></a>
+            </li>
+            <li>
+              <span class="etikett">E-post</span>
+              <a href="mailto:<%= c.bedrift.epost %>"><%= c.bedrift.epost %></a>
+            </li>
+            <li>
+              <span class="etikett">Besøksadresse</span>
+              <span><%= c.bedrift.adresse %><br><%= c.bedrift.postnr %> <%= c.bedrift.poststed %></span>
+            </li>
+            <li>
+              <span class="etikett">Organisasjonsnummer</span>
+              <span><%= c.bedrift.orgnr %></span>
+            </li>
+          </ul>
+
+          <h2 class="mt-2">Åpningstider</h2>
+          <ul class="info-liste">
+            <% (c.bedrift.apningstider || []).forEach(function (a) { %>
+              <li><span class="etikett"><%= a.dag %></span><span><%= a.tid %></span></li>
+            <% }); %>
+          </ul>
+          <% if (c.bedrift.apningstiderErPlassholder && c.bedrift.apningstiderNotat) { %>
+            <p class="plassholder-merke"><%= c.bedrift.apningstiderNotat %></p>
+          <% } %>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

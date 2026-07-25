@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140">
+        <span class="stikk">Prosjekter</span>
+        <h1>Bilder fra jobben</h1>
+        <p>Et utvalg bilder fra oppdrag vi har utført. Alle bildene er hentet fra vår egen Facebook-side.</p>
+      </div>
+
+      <% if ((c.galleri || []).length) { %>
+        <div class="galleri">
+          <% (c.galleri || []).forEach(function (g, i) { %>
+            <figure class="avslor">
+              <img src="<%= bildeUrl(g.bilde) %>"
+                   <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
+                   alt="<%= g.tekst %>" width="1200" height="900" loading="lazy" decoding="async">
+              <figcaption><%= g.tekst %></figcaption>
+            </figure>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="t-midt t-dempa">Ingen bilder er lagt inn ennå.</p>
+      <% } %>
+
+      <% if ((c.omtaler || []).length) { %>
+        <div class="seksjon__topp mt-4">
+          <span class="stikk">Tilbakemeldinger</span>
+          <h2>Hva kundene sier</h2>
+        </div>
+        <div class="kort-rutenett">
+          <% (c.omtaler || []).forEach(function (o, i) { %>
+            <blockquote class="kort avslor">
+              <p class="t-kritt">«<%= o.tekst %>»</p>
+              <footer class="sitat-kjelde"><%= o.navn %><% if (o.kilde) { %> <span class="t-dempa">· <%= o.kilde %></span><% } %></footer>
+            </blockquote>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="seksjon seksjon--tone">
+    <div class="wrap">
+      <div class="band avslor">
+        <h2>Skal vi ta en titt på ditt prosjekt?</h2>
+        <p>Send oss noen ord om hva du har planer om, så tar vi kontakt.</p>
+        <div class="band__knappar">
+          <a class="knapp" href="/kontakt#skjema">Be om tilbud</a>
+          <a class="knapp knapp--open" href="<%= telefonLenke(c.bedrift.telefon) %>">Ring <%= c.bedrift.telefon %></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

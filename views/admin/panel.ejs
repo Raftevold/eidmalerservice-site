@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrasjon – Eid Malerservice AS</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/cormorant-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=6">
+<link rel="stylesheet" href="/css/admin.css?v=6">
+</head>
+<body class="adm">
+
+<header class="adm__topp">
+  <a class="adm__merke" href="/admin">
+    <img src="/img/logo.png" alt="" width="1039" height="490">
+    <span>Administrasjon</span>
+  </a>
+
+  <div class="adm__topphandling">
+    <span class="adm__lagringsmodus" title="Hvor innholdet lagres">
+      <span class="adm__prikk"></span> Lagres <%= lagringsmodus === 'GitHub' ? 'trygt i skyen' : 'lokalt (utvikling)' %>
+    </span>
+    <span id="lagreStatus" class="adm__status" role="status" aria-live="polite"></span>
+    <button type="button" class="knapp knapp--liten" id="lagreKnapp">Lagre endringer</button>
+    <a class="adm__lenke" href="/" target="_blank" rel="noopener">Se nettsiden ↗</a>
+    <form method="post" action="/admin/logout" class="adm__utlogg">
+      <button type="submit" class="adm__lenke adm__lenke--knapp">Logg ut</button>
+    </form>
+  </div>
+</header>
+
+<% if (noindex) { %>
+  <p class="adm__demovarsel">
+    Demomodus: siden er skjult for Google (<code>noindex</code>). Miljøvariabelen <code>DEMO_NOINDEX=0</code> slår på synlighet ved lansering.
+  </p>
+<% } %>
+
+<div class="adm__layout">
+  <nav class="adm__sidemeny" aria-label="Seksjoner">
+    <button type="button" class="adm__fane er-valgt" data-fane="oversikt">Oversikt</button>
+    <button type="button" class="adm__fane" data-fane="varsel">Varsellinje</button>
+    <button type="button" class="adm__fane" data-fane="forside">Forside</button>
+    <button type="button" class="adm__fane" data-fane="tjenester">Tjenester</button>
+    <button type="button" class="adm__fane" data-fane="galleri">Galleri</button>
+    <button type="button" class="adm__fane" data-fane="omoss">Om oss</button>
+    <button type="button" class="adm__fane" data-fane="omtaler">Omtaler</button>
+    <button type="button" class="adm__fane" data-fane="bedrift">Kontakt &amp; åpningstider</button>
+    <button type="button" class="adm__fane" data-fane="seo">SEO</button>
+    <button type="button" class="adm__fane" data-fane="bilder">Bildebibliotek</button>
+    <button type="button" class="adm__fane" data-fane="meldinger">
+      Henvendelser <span class="adm__teljar" id="meldingTeljar"></span>
+    </button>
+  </nav>
+
+  <main class="adm__innhald" id="admInnhald">
+    <p class="adm__lastar">Laster innhold …</p>
+  </main>
+</div>
+
+<!-- Bildeveljar -->
+<div class="adm__modal" id="bildeModal" hidden>
+  <div class="adm__modalkort" role="dialog" aria-modal="true" aria-labelledby="bildeModalTittel">
+    <div class="adm__modaltopp">
+      <h2 id="bildeModalTittel">Velg bilde</h2>
+      <button type="button" class="adm__lukk" id="bildeModalLukk" aria-label="Lukk">×</button>
+    </div>
+    <div class="adm__modalkropp" id="bildeModalKropp"></div>
+  </div>
+</div>
+
+<script src="/js/admin.js?v=6" defer></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<footer class="botn">
+  <div class="wrap botn__grid">
+    <div class="botn__merke">
+      <img src="/img/logo.png" alt="<%= c.bedrift.navn %>" width="1039" height="490" loading="lazy">
+      <p class="botn__slag">Malerarbeid i Nordfjord siden 2008.</p>
+    </div>
+
+    <div>
+      <h2 class="botn__tittel">Kontakt</h2>
+      <ul class="botn__liste">
+        <li><a href="<%= telefonLenke(c.bedrift.telefon) %>"><%= c.bedrift.telefon %></a></li>
+        <li><a href="mailto:<%= c.bedrift.epost %>"><%= c.bedrift.epost %></a></li>
+        <li><%= c.bedrift.adresse %><br><%= c.bedrift.postnr %> <%= c.bedrift.poststed %></li>
+        <li>Org.nr. <%= c.bedrift.orgnr %></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="botn__tittel">Åpningstider</h2>
+      <ul class="botn__liste">
+        <% (c.bedrift.apningstider || []).forEach(function (a) { %>
+          <li><span><%= a.dag %></span> <span class="botn__tid"><%= a.tid %></span></li>
+        <% }); %>
+      </ul>
+      <% if (c.bedrift.apningstiderErPlassholder && c.bedrift.apningstiderNotat) { %>
+        <p class="plassholder-merke"><%= c.bedrift.apningstiderNotat %></p>
+      <% } %>
+    </div>
+
+    <div>
+      <h2 class="botn__tittel">Sider</h2>
+      <ul class="botn__liste">
+        <li><a href="/tjenester">Tjenester</a></li>
+        <li><a href="/prosjekter">Prosjekter</a></li>
+        <li><a href="/om-oss">Om oss</a></li>
+        <li><a href="/kontakt">Kontakt</a></li>
+        <li><a href="/personvern">Personvern</a></li>
+      </ul>
+      <% if (c.bedrift.facebook || c.bedrift.instagram) { %>
+        <div class="botn__sosial">
+          <% if (c.bedrift.facebook) { %>
+            <a href="<%= c.bedrift.facebook %>" rel="noopener noreferrer" target="_blank" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5H16.7V3.6c-.3 0-1.3-.1-2.5-.1-2.4 0-4.1 1.5-4.1 4.2v2.2H7.4V13h2.7v8h3.4Z"/></svg>
+            </a>
+          <% } %>
+          <% if (c.bedrift.instagram) { %>
+            <a href="<%= c.bedrift.instagram %>" rel="noopener noreferrer" target="_blank" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 8.1a3.9 3.9 0 1 0 0 7.8 3.9 3.9 0 0 0 0-7.8Zm0 6.4a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Zm5-6.6a.9.9 0 1 1-1.8 0 .9.9 0 0 1 1.8 0ZM20 8.5c0-1.3-.3-2.4-1.2-3.3-.9-.9-2-1.2-3.3-1.3-1.3-.1-5.3-.1-6.6 0-1.3 0-2.4.3-3.3 1.2C4.7 6 4.4 7.2 4.3 8.5c-.1 1.3-.1 5.3 0 6.6 0 1.3.3 2.4 1.3 3.3.9.9 2 1.2 3.3 1.3 1.3.1 5.3.1 6.6 0 1.3 0 2.4-.4 3.3-1.3.9-.9 1.2-2 1.3-3.3.1-1.3.1-5.3 0-6.6Zm-1.7 8a2.5 2.5 0 0 1-1.4 1.4c-1 .4-3.3.3-4.4.3s-3.4.1-4.4-.3a2.5 2.5 0 0 1-1.4-1.4c-.4-1-.3-3.3-.3-4.4s-.1-3.4.3-4.4A2.5 2.5 0 0 1 8.1 6c1-.4 3.3-.3 4.4-.3s3.4-.1 4.4.3c.6.3 1.1.8 1.4 1.4.4 1 .3 3.3.3 4.4s.1 3.4-.3 4.4Z"/></svg>
+            </a>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="wrap botn__nede">
+    <p>&copy; <%= new Date().getFullYear() %> <%= c.bedrift.navn %>. Org.nr. <%= c.bedrift.orgnr %>.</p>
+    <p class="botn__demo">Demoversjon – ikke bedriftens offisielle nettside.</p>
+  </div>
+</footer>
+
+<div class="mobil-linje" aria-label="Rask kontakt">
+  <a class="mobil-linje__ring" href="<%= telefonLenke(c.bedrift.telefon) %>">
+    <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z"/></svg>
+    Ring oss
+  </a>
+  <a class="mobil-linje__tilbod" href="/kontakt#skjema">Be om tilbud</a>
+</div>
+
+<div class="kapsel-melding" id="kapselMelding" hidden>
+  <p>Denne nettsiden bruker <strong>ingen sporings- eller analysekapsler</strong>. Vi lagrer bare det som trengs for at siden skal virke.
+    <a href="/personvern">Les mer om personvern</a>.</p>
+  <button type="button" id="kapselOk" class="knapp knapp--liten">Greit</button>
+</div>
+
+<script src="/js/main.js?v=6" defer></script>

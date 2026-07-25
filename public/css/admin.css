@@ -1,0 +1,249 @@
+/* Administrasjonsgrensesnitt for Eid Malerservice.
+   Same fargespråk som nettsida, men tettare og meir arbeidsretta. */
+
+.innlogging {
+  min-height: 100vh; display: grid; place-items: center; padding: 2rem 1.2rem;
+  background: radial-gradient(120% 90% at 50% 0%, #201d18, var(--svart));
+}
+.innlogging__kort {
+  width: min(100%, 26rem); background: var(--svart-2);
+  border: 1px solid var(--linje); border-radius: 6px; padding: 2.4rem 2rem;
+  box-shadow: 0 40px 90px -50px #000;
+}
+.innlogging__logo { width: 200px; margin: 0 auto 1.6rem; }
+.innlogging__kort h1 { font-size: 1.9rem; text-align: center; }
+.innlogging__kort > p { text-align: center; margin-bottom: 1.6rem; }
+.innlogging__kort .knapp { width: 100%; }
+.innlogging__tilbake { text-align: center; margin: 1.6rem 0 0; font-size: .9rem; }
+
+/* ---------- ramme ---------- */
+
+.adm { background: var(--svart); min-height: 100vh; margin: 0; }
+
+.adm__topp {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+  padding: .75rem 1.4rem; background: var(--svart-2);
+  border-bottom: 1px solid var(--linje);
+}
+.adm__merke { display: flex; align-items: center; gap: .9rem; text-decoration: none; color: var(--kritt); }
+.adm__merke img { width: 128px; }
+.adm__merke span { font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gull); }
+
+.adm__topphandling { margin-left: auto; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.adm__lagringsmodus { display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; color: var(--dempa); }
+.adm__prikk { width: 8px; height: 8px; border-radius: 50%; background: #6f9a5f; display: inline-block; }
+.adm__status { font-size: .86rem; color: var(--gull-lys); min-width: 6rem; }
+.adm__status--feil { color: var(--raud); }
+.adm__lenke { color: var(--dempa); font-size: .88rem; text-decoration: none; background: none; border: 0; cursor: pointer; font-family: inherit; }
+.adm__lenke:hover { color: var(--gull-lys); }
+.adm__utlogg { margin: 0; }
+
+.adm__demovarsel {
+  margin: 0; padding: .6rem 1.4rem; font-size: .84rem;
+  background: rgba(201, 165, 94, .12); border-bottom: 1px solid var(--linje); color: #e0d5c0;
+}
+.adm__demovarsel code { background: var(--svart-3); padding: .1rem .35rem; border-radius: 3px; color: var(--gull-lys); }
+
+.adm__layout { display: grid; grid-template-columns: 226px 1fr; align-items: start; }
+
+.adm__sidemeny {
+  position: sticky; top: 62px; display: flex; flex-direction: column;
+  padding: 1.2rem .7rem; gap: .16rem; border-right: 1px solid var(--linje);
+  min-height: calc(100vh - 62px);
+}
+.adm__fane {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  background: none; border: 0; border-radius: 4px; cursor: pointer;
+  color: var(--dempa); font: inherit; font-size: .93rem; text-align: left;
+  padding: .6rem .75rem; transition: background var(--overgang), color var(--overgang);
+}
+.adm__fane:hover { background: var(--svart-3); color: var(--kritt); }
+.adm__fane.er-valgt { background: var(--svart-3); color: var(--gull-lys); box-shadow: inset 2px 0 0 var(--gull); }
+.adm__teljar {
+  background: var(--gull); color: #16130d; border-radius: 999px;
+  font-size: .72rem; font-weight: 700; padding: .1rem .45rem; min-width: 1.3rem; text-align: center;
+}
+.adm__teljar:empty { display: none; }
+
+.adm__innhald { padding: 1.8rem 1.8rem 5rem; max-width: 62rem; }
+.adm__lastar { color: var(--dempa); }
+
+/* ---------- seksjonar og kort ---------- */
+
+.adm__seksjon h1 { font-size: 2rem; margin-bottom: .2em; }
+.adm__leiing { color: var(--dempa); margin-bottom: 1.8rem; max-width: 46rem; }
+
+.boks {
+  background: var(--svart-2); border: 1px solid var(--linje);
+  border-radius: 6px; padding: 1.4rem; margin-bottom: 1.1rem;
+}
+.boks__topp { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+.boks__topp h2 { font-size: 1.25rem; margin: 0; }
+.boks__topp .knapp { margin-left: auto; }
+.boks__hjelp { color: var(--dempa); font-size: .88rem; margin: -.6rem 0 1.1rem; }
+
+.rutenett-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.rutenett-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 860px) { .rutenett-2, .rutenett-3 { grid-template-columns: 1fr; } }
+
+.adm .felt label { color: var(--kritt); }
+.adm .felt input, .adm .felt textarea, .adm .felt select { background: var(--svart-3); font-size: .96rem; }
+.adm .felt textarea { min-height: 108px; }
+.adm .felt + .felt { margin-top: .9rem; }
+
+/* ---------- nøkkeltal / oversikt ---------- */
+
+.snarveg-rutenett { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.6rem; }
+.snarveg {
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 6px;
+  padding: 1.2rem; text-align: left; cursor: pointer; font: inherit; color: var(--kritt);
+  transition: transform var(--overgang), border-color var(--overgang);
+}
+.snarveg:hover { transform: translateY(-3px); border-color: var(--gull-mørk); }
+.snarveg b { display: block; font-family: var(--serif); font-size: 2rem; color: var(--gull-lys); line-height: 1; margin-bottom: .3rem; }
+.snarveg span { font-size: .88rem; color: var(--dempa); }
+
+/* ---------- element i liste (tenester, galleri, omtalar) ---------- */
+
+.element {
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 6px;
+  padding: 1.1rem; margin-bottom: .9rem;
+  display: grid; grid-template-columns: 120px 1fr auto; gap: 1.1rem; align-items: start;
+}
+.element--utan-bilde { grid-template-columns: 1fr auto; }
+.element__felt { min-width: 0; }
+.element__handling { display: flex; flex-direction: column; gap: .4rem; }
+
+.miniknapp {
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 4px;
+  color: var(--dempa); font: inherit; font-size: .84rem; padding: .38rem .6rem; cursor: pointer;
+  white-space: nowrap; transition: color var(--overgang), border-color var(--overgang);
+}
+.miniknapp:hover { color: var(--kritt); border-color: var(--gull-mørk); }
+.miniknapp--fare:hover { color: var(--raud); border-color: var(--raud); }
+
+/* ---------- biletveljar ---------- */
+
+.bilderute {
+  position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 4px; overflow: hidden;
+  border: 1px solid var(--linje); background: var(--svart-3);
+  display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.bilderute img { width: 100%; height: 100%; object-fit: cover; }
+.bilderute__tom { color: var(--dempa); font-size: .82rem; text-align: center; padding: .6rem; }
+.bilderute:hover { border-color: var(--gull-mørk); }
+.bilderute__overlegg {
+  position: absolute; inset: 0; background: rgba(19,18,17,.72); color: var(--kritt);
+  display: grid; place-items: center; font-size: .84rem; opacity: 0; transition: opacity var(--overgang);
+}
+.bilderute:hover .bilderute__overlegg { opacity: 1; }
+
+.opplast-sone {
+  border: 2px dashed var(--linje); border-radius: 6px; padding: 1.6rem;
+  text-align: center; color: var(--dempa); cursor: pointer;
+  transition: border-color var(--overgang), background var(--overgang);
+}
+.opplast-sone:hover, .opplast-sone.er-over { border-color: var(--gull); background: rgba(201,165,94,.06); }
+.opplast-sone strong { color: var(--kritt); display: block; margin-bottom: .3rem; }
+
+.forhandsvis { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: .8rem; margin-top: 1rem; }
+.forhandsvis__kort { border: 1px solid var(--gull-mørk); border-radius: 4px; overflow: hidden; position: relative; }
+.forhandsvis__kort img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.forhandsvis__merke {
+  position: absolute; left: 0; right: 0; bottom: 0; background: rgba(19,18,17,.85);
+  font-size: .74rem; padding: .3rem .4rem; text-align: center; color: var(--gull-lys);
+}
+
+.bibliotek { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: .9rem; }
+.bibliotek__kort { position: relative; border: 1px solid var(--linje); border-radius: 4px; overflow: hidden; background: var(--svart-3); }
+.bibliotek__kort img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.bibliotek__namn { font-size: .74rem; color: var(--dempa); padding: .4rem .5rem; word-break: break-all; }
+.bibliotek__slett {
+  position: absolute; top: .4rem; right: .4rem; background: rgba(19,18,17,.86);
+  border: 1px solid var(--linje); border-radius: 4px; color: var(--dempa);
+  cursor: pointer; font-size: .8rem; padding: .2rem .45rem;
+}
+.bibliotek__slett:hover { color: var(--raud); border-color: var(--raud); }
+.merkelapp {
+  display: inline-block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gull); border: 1px solid var(--gull-mørk); border-radius: 3px; padding: .1rem .4rem;
+}
+
+/* ---------- modal ---------- */
+
+.adm__modal {
+  position: fixed; inset: 0; z-index: 200; background: rgba(10, 9, 8, .82);
+  display: grid; place-items: center; padding: 1.4rem;
+}
+.adm__modal[hidden] { display: none; }
+.adm__modalkort {
+  width: min(100%, 56rem); max-height: 86vh; display: flex; flex-direction: column;
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 8px;
+}
+.adm__modaltopp {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.1rem 1.3rem; border-bottom: 1px solid var(--linje);
+}
+.adm__modaltopp h2 { margin: 0; font-size: 1.3rem; }
+.adm__lukk {
+  margin-left: auto; background: none; border: 0; color: var(--dempa);
+  font-size: 1.7rem; line-height: 1; cursor: pointer; padding: 0 .3rem;
+}
+.adm__lukk:hover { color: var(--kritt); }
+.adm__modalkropp { padding: 1.3rem; overflow-y: auto; }
+.adm__modalkropp h3 { font-size: 1rem; font-family: var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gull); margin: 1.4rem 0 .8rem; }
+.adm__modalkropp h3:first-child { margin-top: 0; }
+
+.veljar { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .8rem; }
+.veljar__kort {
+  border: 1px solid var(--linje); border-radius: 4px; overflow: hidden;
+  background: var(--svart-3); cursor: pointer; padding: 0; transition: border-color var(--overgang), transform var(--overgang);
+}
+.veljar__kort:hover { border-color: var(--gull); transform: translateY(-2px); }
+.veljar__kort img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.veljar__kort span { display: block; font-size: .76rem; color: var(--dempa); padding: .35rem .4rem; }
+
+/* ---------- meldingar ---------- */
+
+.melding {
+  background: var(--svart-2); border: 1px solid var(--linje); border-left-width: 3px;
+  border-radius: 6px; padding: 1.1rem 1.2rem; margin-bottom: .8rem;
+}
+.melding--ulest { border-left-color: var(--gull); }
+.melding__topp { display: flex; flex-wrap: wrap; align-items: baseline; gap: .7rem; margin-bottom: .5rem; }
+.melding__namn { font-weight: 650; color: var(--kritt); }
+.melding__tid { font-size: .82rem; color: var(--dempa); margin-left: auto; }
+.melding__kontakt { font-size: .88rem; }
+.melding__kontakt a { color: var(--gull-lys); }
+.melding__tekst { color: #ddd4c6; white-space: pre-wrap; margin: .7rem 0; }
+.melding__handling { display: flex; gap: .5rem; }
+
+.tom-melding { color: var(--dempa); background: var(--svart-2); border: 1px dashed var(--linje); border-radius: 6px; padding: 2rem; text-align: center; }
+
+/* ---------- bryter ---------- */
+
+.bryter { display: inline-flex; align-items: center; gap: .7rem; cursor: pointer; }
+.bryter input { position: absolute; opacity: 0; width: 0; height: 0; }
+.bryter__spor {
+  width: 46px; height: 26px; border-radius: 999px; background: var(--svart-3);
+  border: 1px solid var(--linje); position: relative; transition: background var(--overgang), border-color var(--overgang);
+}
+.bryter__spor::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--dempa); transition: transform var(--overgang), background var(--overgang);
+}
+.bryter input:checked + .bryter__spor { background: var(--gull-mørk); border-color: var(--gull); }
+.bryter input:checked + .bryter__spor::after { transform: translateX(20px); background: var(--gull-lys); }
+.bryter input:focus-visible + .bryter__spor { outline: 3px solid var(--gull-lys); outline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .adm__layout { grid-template-columns: 1fr; }
+  .adm__sidemeny {
+    position: static; min-height: 0; flex-direction: row; overflow-x: auto;
+    border-right: 0; border-bottom: 1px solid var(--linje); padding: .6rem;
+  }
+  .adm__fane { white-space: nowrap; }
+  .adm__innhald { padding: 1.2rem 1rem 4rem; }
+  .element { grid-template-columns: 1fr; }
+}

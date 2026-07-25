@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <span class="stikk">Personvern</span>
+        <h1>Personvernerklæring</h1>
+      </div>
+
+      <div class="tekstbolk midt-boks">
+        <p><strong><%= c.bedrift.navn %></strong>, org.nr. <%= c.bedrift.orgnr %>, <%= c.bedrift.adresse %>,
+          <%= c.bedrift.postnr %> <%= c.bedrift.poststed %>, er behandlingsansvarlig for personopplysninger
+          som samles inn gjennom denne nettsiden.</p>
+
+        <h2>Hvilke opplysninger vi samler inn</h2>
+        <p>Vi samler kun inn opplysninger du selv skriver inn i kontaktskjemaet: navn, e-postadresse,
+          telefonnummer, hvilken tjeneste henvendelsen gjelder, og selve meldingen. Vi samler ikke inn
+          opplysninger om deg på andre måter når du besøker sidene.</p>
+
+        <h2>Hva vi bruker opplysningene til</h2>
+        <p>Opplysningene brukes utelukkende til å svare på henvendelsen din og eventuelt gi deg et tilbud.
+          Det rettslige grunnlaget er berettiget interesse i å besvare henvendelser, jf. personvernforordningen
+          artikkel 6 nr. 1 bokstav f, og tiltak før avtaleinngåelse etter bokstav b.</p>
+
+        <h2>Lagring og sletting</h2>
+        <p>Henvendelser lagres i et lukket, passordbeskyttet administrasjonsområde som bare bedriften har
+          tilgang til. Vi sletter henvendelser når de ikke lenger er nødvendige, og senest når det har gått
+          to år uten videre kontakt. Bedriften kan slette en henvendelse manuelt når som helst.</p>
+
+        <h2>Informasjonskapsler (cookies)</h2>
+        <p>Denne nettsiden bruker <strong>ingen informasjonskapsler til analyse, sporing eller markedsføring</strong>.
+          Vi har heller ikke Google Analytics, Facebook-piksel eller tilsvarende verktøy.</p>
+        <p>De eneste tingene som lagres i nettleseren din er:</p>
+        <ul class="liste-lys">
+          <li>En liten markering i nettleserens lokale lagring om at du har lest informasjonsmeldingen nederst
+            på siden, slik at den ikke vises igjen. Denne lagres bare hvis du klikker «Greit».</li>
+          <li>En innloggingskapsel som <em>kun</em> settes for bedriftens egne ansatte når de logger inn i
+            administrasjonsområdet. Den settes aldri for vanlige besøkende.</li>
+        </ul>
+        <p>Fordi vi ikke bruker ikke-nødvendige informasjonskapsler, trenger vi heller ikke å be deg om
+          samtykke etter ekomloven § 3-15.</p>
+
+        <h2>Deling med andre</h2>
+        <p>Vi selger eller deler ikke opplysningene dine med tredjeparter for markedsføring. Nettsiden driftes
+          hos en teknisk leverandør (skytjeneste) som lagrer innholdet på våre vegne, og som er underlagt
+          databehandleravtale.</p>
+
+        <h2>Dine rettigheter</h2>
+        <p>Du har rett til innsyn i, retting av og sletting av opplysningene vi har om deg, og til å protestere
+          mot behandlingen. Ta kontakt på <a href="mailto:<%= c.bedrift.epost %>"><%= c.bedrift.epost %></a>
+          eller <a href="<%= telefonLenke(c.bedrift.telefon) %>"><%= c.bedrift.telefon %></a>.</p>
+        <p>Mener du at vi behandler opplysningene dine i strid med regelverket, kan du klage til Datatilsynet.</p>
+
+        <h2>Endringer</h2>
+        <p>Vi kan oppdatere denne erklæringen. Siste oppdatering: <%= new Date().toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' }) %>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

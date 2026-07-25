@@ -1,0 +1,44 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= seo.title %></title>
+<meta name="description" content="<%= seo.description %>">
+<% if (noindex) { %><meta name="robots" content="noindex, nofollow"><% } %>
+<link rel="canonical" href="<%= baseUrl %><%= side === 'forside' ? '/' : '/' + side %>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="<%= c.bedrift.navn %>">
+<meta property="og:title" content="<%= seo.title %>">
+<meta property="og:description" content="<%= seo.description %>">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:image" content="<%= baseUrl %>/img/fasade-1600.webp">
+<meta name="theme-color" content="#131211">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/cormorant-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=6">
+<link rel="stylesheet" href="/css/innhald.css">
+<noscript><link rel="stylesheet" href="/css/utan-js.css"></noscript>
+<script type="application/ld+json">
+<%- JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "HousePainter",
+  "name": c.bedrift.navn,
+  "image": baseUrl + "/img/fasade-1600.webp",
+  "logo": baseUrl + "/img/logo.png",
+  "url": baseUrl + "/",
+  "telephone": "+47" + String(c.bedrift.telefon || "").replace(/\s/g, ""),
+  "email": c.bedrift.epost,
+  "vatID": "NO" + String(c.bedrift.orgnr || "").replace(/\s/g, "") + "MVA",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": c.bedrift.adresse,
+    "postalCode": c.bedrift.postnr,
+    "addressLocality": c.bedrift.poststed,
+    "addressCountry": "NO"
+  },
+  "areaServed": { "@type": "Place", "name": "Nordfjord, Vestland" },
+  "foundingDate": "2008",
+  "sameAs": [c.bedrift.facebook, c.bedrift.instagram].filter(Boolean),
+  "makesOffer": (c.tjenester || []).map(function (t) {
+    return { "@type": "Offer", "itemOffered": { "@type": "Service", "name": t.navn, "description": t.kort } };
+  })
+}) %>
+</script>

@@ -1,0 +1,5 @@
+/* Lastast berre inne i <noscript>. Utan JavaScript skal alt innhald vere synleg
+   med ein gong - scroll-avsløringane skal aldri kunne skjule innhald permanent. */
+.avslor { opacity: 1 !important; transform: none !important; }
+.ornament { transform: scaleX(1) !important; }
+.ornament--botn { transform: scaleX(1) rotate(180deg) !important; }

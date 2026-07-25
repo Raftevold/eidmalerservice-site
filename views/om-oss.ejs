@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140">
+        <span class="stikk">Om oss</span>
+        <h1><%= c.omOss.tittel %></h1>
+        <p><%= c.omOss.ingress %></p>
+      </div>
+
+      <div class="tenestebolk avslor utan-kant">
+        <div class="tenestebolk__media">
+          <% if (c.omOss.bilde && bildeUrl(c.omOss.bilde)) { %>
+            <img src="<%= bildeUrl(c.omOss.bilde) %>"
+                 <% if (bildeSrcset(c.omOss.bilde)) { %>srcset="<%= bildeSrcset(c.omOss.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
+                 alt="<%= bildeAlt(c.omOss.bilde, 'Arbeidslaget i Eid Malerservice') %>"
+                 width="1600" height="1200" loading="lazy" decoding="async">
+          <% } %>
+        </div>
+        <div class="tekstbolk">
+          <% String(c.omOss.tekst || '').split('\n').filter(Boolean).forEach(function (avsnitt) { %>
+            <p><%= avsnitt %></p>
+          <% }); %>
+          <% if (c.omOss.dagligLeder) { %>
+            <p class="t-dempa"><strong class="t-gull">Daglig leder:</strong> <%= c.omOss.dagligLeder %></p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seksjon seksjon--tone">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <span class="stikk">Fakta</span>
+        <h2>Kort om selskapet</h2>
+      </div>
+      <div class="punkt-rutenett">
+        <div class="punkt avslor"><h3>Organisasjonsnummer</h3><p><%= c.bedrift.orgnr %></p></div>
+        <div class="punkt avslor"><h3>Adresse</h3><p><%= c.bedrift.adresse %>, <%= c.bedrift.postnr %> <%= c.bedrift.poststed %></p></div>
+        <div class="punkt avslor"><h3>Bransje</h3><p>Maler- og glassarbeid</p></div>
+        <div class="punkt avslor"><h3>Ansatte</h3><p>10 fagfolk</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="band avslor">
+        <h2>Vil du ha oss på jobben?</h2>
+        <p>Ta kontakt for en uforpliktende prat om prosjektet ditt.</p>
+        <div class="band__knappar">
+          <a class="knapp" href="/kontakt#skjema">Be om tilbud</a>
+          <a class="knapp knapp--open" href="<%= telefonLenke(c.bedrift.telefon) %>">Ring <%= c.bedrift.telefon %></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

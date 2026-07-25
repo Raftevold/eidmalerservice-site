@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logg inn – administrasjon</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/cormorant-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=6">
+<link rel="stylesheet" href="/css/admin.css?v=6">
+</head>
+<body class="innlogging">
+  <main class="innlogging__kort">
+    <img class="innlogging__logo" src="/img/logo.png" alt="Eid Malerservice AS" width="1039" height="490">
+    <h1>Administrasjon</h1>
+    <p class="t-dempa">Logg inn for å redigere innholdet på nettsiden.</p>
+
+    <% if (feil) { %>
+      <div class="melding-boks melding-boks--feil" role="alert">Feil passord. Prøv igjen.</div>
+    <% } %>
+    <% if (laast) { %>
+      <div class="melding-boks melding-boks--feil" role="alert">
+        For mange forsøk. Vent 15 minutter før du prøver på nytt.
+      </div>
+    <% } %>
+
+    <form method="post" action="/admin/login" class="skjema">
+      <div class="felt">
+        <label for="passord">Passord</label>
+        <input type="password" id="passord" name="passord" autocomplete="current-password" required autofocus>
+      </div>
+      <button class="knapp" type="submit">Logg inn</button>
+    </form>
+
+    <p class="innlogging__tilbake"><a href="/">← Tilbake til nettsiden</a></p>
+  </main>
+</body>
+</html>

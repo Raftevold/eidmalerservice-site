@@ -1,0 +1,157 @@
+{
+  "bedrift": {
+    "navn": "Eid Malerservice AS",
+    "orgnr": "924 718 536",
+    "telefon": "952 48 685",
+    "epost": "post@eidmalerservice.com",
+    "adresse": "Øyane 8",
+    "postnr": "6770",
+    "poststed": "Nordfjordeid",
+    "facebook": "https://www.facebook.com/eidmalerservice/",
+    "instagram": "",
+    "apningstider": [
+      { "dag": "Mandag – fredag", "tid": "07:00 – 15:30" },
+      { "dag": "Lørdag – søndag", "tid": "Stengt" }
+    ],
+    "apningstiderNotat": "PLASSHALDAR – åpningstidene er ikke bekreftet av bedriften. Rediger eller fjern dem i admin.",
+    "apningstiderErPlassholder": true
+  },
+  "varsel": {
+    "aktiv": false,
+    "tekst": "",
+    "lenke": ""
+  },
+  "forside": {
+    "heroOvertittel": "Malerarbeid i Nordfjord siden 2008",
+    "heroTittel": "Vi gir rommet et finish som varer",
+    "heroIngress": "Eid Malerservice er ti fagfolk med base i Nordfjordeid. Vi utfører alt innen malerfaget – innvendig og utvendig – for private og bedrifter, på nybygg og rehabilitering.",
+    "heroCta": "Be om tilbud",
+    "heroCtaSekundar": "Ring oss",
+    "heroBilde": "fasade",
+    "nokkeltall": [
+      { "tall": "2008", "tekst": "Drevet siden" },
+      { "tall": "10", "tekst": "Fagfolk på laget" },
+      { "tall": "6", "tekst": "Fagområder" }
+    ],
+    "tjenesterTittel": "Dette gjør vi",
+    "tjenesterIngress": "Store og små oppdrag, for private og bedrifter.",
+    "hvorforTittel": "Hvorfor velge oss",
+    "hvorforPunkter": [
+      {
+        "tittel": "Et samlet fagmiljø",
+        "tekst": "Ti fagfolk under samme tak betyr at vi tar hele jobben – fra sparkling og maling til gulv og flis – uten at du må koordinere flere firmaer."
+      },
+      {
+        "tittel": "Lokale i Nordfjordeid",
+        "tekst": "Vi holder til i Øyane 8 og jobber i nærområdet. Kort vei betyr rask befaring og tett oppfølging underveis."
+      },
+      {
+        "tittel": "Fra ett rom til hele bygget",
+        "tekst": "Vi tar både små oppdrag hjemme hos private og større prosjekter for bedrifter, på nybygg så vel som rehabilitering."
+      }
+    ],
+    "ctaTittel": "Skal du pusse opp?",
+    "ctaTekst": "Fortell oss kort hva du tenker på, så tar vi kontakt og avtaler en befaring.",
+    "fargeveggTittel": "Finn fargen",
+    "fargeveggIngress": "Usikker på fargevalget? Vi hjelper deg med å velge. Prøv noen toner her – og ta praten med oss om resten.",
+    "fargevegg": [
+      { "navn": "Kalket hvit", "hex": "#EFEAE1" },
+      { "navn": "Varm sand", "hex": "#D9C7AC" },
+      { "navn": "Salvie", "hex": "#9AA391" },
+      { "navn": "Djup mur", "hex": "#6E6862" },
+      { "navn": "Fjordblå", "hex": "#5C7385" },
+      { "navn": "Nattkull", "hex": "#2E2C29" }
+    ]
+  },
+  "tjenester": [
+    {
+      "id": "innvendig",
+      "navn": "Innvendig maling",
+      "kort": "Vegger, tak og listverk – sparkling, grunning og maling med rent resultat.",
+      "tekst": "Vi tar hele jobben innendørs: forarbeid og sparkling, grunning og strøk, listverk og dører. Vi dekker til og rydder etter oss, slik at rommet er klart til bruk når vi går.",
+      "bilde": "innvendig"
+    },
+    {
+      "id": "utvendig",
+      "navn": "Utvendig maling",
+      "kort": "Fasade, kledning og vindskier – vask, forarbeid og maling som tåler vestlandsvær.",
+      "tekst": "Utvendig arbeid krever riktig forarbeid. Vi vasker, skraper og grunner før vi maler, og bruker systemer som er laget for klimaet på Vestlandet. Vi jobber både fra stillas og lift.",
+      "bilde": "fasade"
+    },
+    {
+      "id": "tapetsering",
+      "navn": "Tapetsering",
+      "kort": "Presis oppsetting av tapet og veggkledning, med jevne skjøter.",
+      "tekst": "Tapet stiller strenge krav til underlaget. Vi gjør forarbeidet som skal til, og setter opp tapet og veggkledning med jevne skjøter og rene avslutninger.",
+      "bilde": ""
+    },
+    {
+      "id": "gulvlegging",
+      "navn": "Gulvlegging",
+      "kort": "Belegg og gulv lagt av folk som gjør det til daglig.",
+      "tekst": "Vi legger gulv og banebelegg, med sveiste skjøter der det trengs. Riktig underlag og god avretting er det som avgjør hvor lenge gulvet holder seg pent.",
+      "bilde": "golv"
+    },
+    {
+      "id": "flislegging",
+      "navn": "Flislegging",
+      "kort": "Flis på bad, gulv og vegg – nøyaktig satt og pent avsluttet.",
+      "tekst": "Vi legger flis på gulv og vegg. God planlegging av mønster og fall gir et resultat som både ser bra ut og fungerer i praksis.",
+      "bilde": ""
+    },
+    {
+      "id": "industribelegg",
+      "navn": "Industribelegg",
+      "kort": "Slitesterke gulvbelegg for næringsbygg og verksted.",
+      "tekst": "For næringsbygg, verksted og lager legger vi slitesterke industribelegg som tåler hard bruk, tunge maskiner og rengjøring.",
+      "bilde": "sproyting"
+    }
+  ],
+  "galleri": [
+    { "bilde": "fasade", "tekst": "Fasadearbeid fra lift på næringsbygg i Nordfjordeid" },
+    { "bilde": "laget", "tekst": "Deler av laget på et større næringsbyggprosjekt" },
+    { "bilde": "sproyting", "tekst": "Sprøyting av puss med maskin på næringsbygg" },
+    { "bilde": "innvendig", "tekst": "Innvendig maling av vegg" },
+    { "bilde": "golv", "tekst": "Sveising av skjøter i banebelegg" },
+    { "bilde": "pauserom", "tekst": "Pause på byggeplass" }
+  ],
+  "omOss": {
+    "tittel": "Om Eid Malerservice",
+    "ingress": "Et malerfirma i Nordfjordeid, drevet siden 2008.",
+    "tekst": "Eid Malerservice ble startet som enkeltpersonforetak i 2008 og gjort om til aksjeselskap i 2020. I dag er vi ti fagfolk med base i Øyane 8 i Nordfjordeid.\n\nVi utfører alt innen malerfaget innvendig og utvendig, i tillegg til tapetsering, gulvlegging, flislegging og industribelegg. Vi tar store og små oppdrag for både private og bedrifter, på nybygg så vel som rehabilitering.\n\nAt vi dekker flere fag internt gjør at du slipper å koordinere mange leverandører. Vi tar jobben fra start til slutt, og rydder etter oss.",
+    "bilde": "laget",
+    "dagligLeder": "Alfred Morten Heimsæter"
+  },
+  "omtaler": [],
+  "kontakt": {
+    "tittel": "Ta kontakt",
+    "ingress": "Fortell kort hva du trenger hjelp til, så tar vi kontakt for å avtale befaring. Du kan også ringe oss direkte.",
+    "takketekst": "Takk for henvendelsen! Vi tar kontakt så snart vi kan."
+  },
+  "seo": {
+    "forside": {
+      "title": "Eid Malerservice AS – maler i Nordfjordeid",
+      "description": "Malerfirma i Nordfjordeid med ti fagfolk. Innvendig og utvendig maling, tapetsering, gulvlegging, flislegging og industribelegg for private og bedrifter."
+    },
+    "tjenester": {
+      "title": "Tjenester – Eid Malerservice AS",
+      "description": "Innvendig og utvendig maling, tapetsering, gulvlegging, flislegging og industribelegg i Nordfjordeid og Nordfjord."
+    },
+    "prosjekter": {
+      "title": "Prosjekter – Eid Malerservice AS",
+      "description": "Se bilder fra malerarbeid og gulvarbeid utført av Eid Malerservice AS i Nordfjordeid."
+    },
+    "om-oss": {
+      "title": "Om oss – Eid Malerservice AS",
+      "description": "Eid Malerservice AS er et malerfirma i Nordfjordeid, drevet siden 2008 og med ti fagfolk på laget."
+    },
+    "kontakt": {
+      "title": "Kontakt – Eid Malerservice AS",
+      "description": "Ta kontakt med Eid Malerservice AS i Nordfjordeid. Ring 952 48 685 eller send oss en melding for uforpliktende tilbud."
+    },
+    "personvern": {
+      "title": "Personvern – Eid Malerservice AS",
+      "description": "Slik behandler Eid Malerservice AS personopplysninger på denne nettsiden."
+    }
+  }
+}

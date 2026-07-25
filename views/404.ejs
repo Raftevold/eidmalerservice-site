@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Siden finnes ikke – <%= c.bedrift.navn %></title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/cormorant-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/style.css?v=6">
+<noscript><link rel="stylesheet" href="/css/utan-js.css"></noscript>
+</head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap t-midt pad-blokk">
+      <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140">
+      <span class="stikk">404</span>
+      <h1>Denne siden fant vi ikke</h1>
+      <p class="t-dempa smal-midt">
+        Siden kan ha blitt flyttet eller fjernet. Prøv menyen over, eller ta kontakt med oss direkte.
+      </p>
+      <div class="band__knappar mt-3">
+        <a class="knapp" href="/">Til forsiden</a>
+        <a class="knapp knapp--open" href="/kontakt#skjema">Kontakt oss</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

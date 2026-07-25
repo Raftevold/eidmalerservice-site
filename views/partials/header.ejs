@@ -1,0 +1,41 @@
+<a class="hopp-lenke" href="#hovudinnhald">Hopp til hovedinnhold</a>
+
+<% if (c.varsel && c.varsel.aktiv && c.varsel.tekst) { %>
+  <% if (c.varsel.lenke) { %>
+    <a class="varsellinje varsellinje--lenke" href="<%= c.varsel.lenke %>">
+      <span><%= c.varsel.tekst %></span>
+      <span class="varsellinje__pil" aria-hidden="true">→</span>
+    </a>
+  <% } else { %>
+    <div class="varsellinje"><span><%= c.varsel.tekst %></span></div>
+  <% } %>
+<% } %>
+
+<header class="topp" id="topp">
+  <div class="topp__inner">
+    <a class="merke" href="/" aria-label="<%= c.bedrift.navn %> – til forsiden">
+      <img src="/img/logo.png" alt="<%= c.bedrift.navn %>" width="1039" height="490" fetchpriority="high">
+    </a>
+
+    <nav class="nav" id="hovudnav" aria-label="Hovedmeny">
+      <ul>
+        <li><a href="/" <%= side === 'forside' ? 'aria-current="page"' : '' %>>Hjem</a></li>
+        <li><a href="/tjenester" <%= side === 'tjenester' ? 'aria-current="page"' : '' %>>Tjenester</a></li>
+        <li><a href="/prosjekter" <%= side === 'prosjekter' ? 'aria-current="page"' : '' %>>Prosjekter</a></li>
+        <li><a href="/om-oss" <%= side === 'om-oss' ? 'aria-current="page"' : '' %>>Om oss</a></li>
+        <li><a href="/kontakt" <%= side === 'kontakt' ? 'aria-current="page"' : '' %>>Kontakt</a></li>
+      </ul>
+    </nav>
+
+    <div class="topp__handling">
+      <a class="tlf-lenke" href="<%= telefonLenke(c.bedrift.telefon) %>">
+        <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z"/></svg>
+        <span><%= c.bedrift.telefon %></span>
+      </a>
+      <a class="knapp knapp--liten" href="/kontakt#skjema">Be om tilbud</a>
+      <button class="meny-knapp" type="button" aria-expanded="false" aria-controls="hovudnav" aria-label="Åpne meny">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>

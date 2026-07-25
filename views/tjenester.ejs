@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140">
+        <span class="stikk">Tjenester</span>
+        <h1>Alt innen malerfaget</h1>
+        <p>Vi tar store og små oppdrag for private og bedrifter, på nybygg og rehabilitering – i Nordfjordeid og resten av Nordfjord.</p>
+      </div>
+
+      <% (c.tjenester || []).forEach(function (t, i) { %>
+        <article class="tenestebolk <%= i % 2 === 1 ? 'tenestebolk--snu' : '' %> avslor" id="<%= t.id %>">
+          <div class="tenestebolk__media">
+            <% if (t.bilde && bildeUrl(t.bilde)) { %>
+              <img src="<%= bildeUrl(t.bilde) %>"
+                   <% if (bildeSrcset(t.bilde)) { %>srcset="<%= bildeSrcset(t.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
+                   alt="<%= bildeAlt(t.bilde, t.navn + ' utført av Eid Malerservice') %>"
+                   width="1200" height="900" loading="lazy" decoding="async">
+            <% } else { %>
+              <div class="tenestebolk__utan">
+                <p><strong>PLASSHOLDER</strong><br>Vi mangler et bilde av <%= t.navn.toLowerCase() %>.<br>Last opp ett i admin.</p>
+              </div>
+            <% } %>
+          </div>
+          <div>
+            <span class="stikk"><%= String(i + 1).padStart(2, '0') %></span>
+            <h2><%= t.navn %></h2>
+            <p class="t-dempa"><%= t.tekst %></p>
+            <a class="knapp knapp--liten" href="/kontakt?tjeneste=<%= encodeURIComponent(t.navn) %>#skjema">Be om tilbud på <%= t.navn.toLowerCase() %></a>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class="seksjon seksjon--tone">
+    <div class="wrap">
+      <div class="band avslor">
+        <h2>Usikker på hva jobben koster?</h2>
+        <p>Vi kommer gjerne på befaring og gir deg et uforpliktende tilbud.</p>
+        <div class="band__knappar">
+          <a class="knapp" href="/kontakt#skjema">Be om tilbud</a>
+          <a class="knapp knapp--open" href="<%= telefonLenke(c.bedrift.telefon) %>">Ring <%= c.bedrift.telefon %></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>

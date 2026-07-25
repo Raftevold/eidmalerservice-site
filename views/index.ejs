@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="nb">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/header') %>
+
+<main id="hovudinnhald">
+
+  <section class="hero">
+    <div class="hero__media">
+      <img src="<%= bildeUrl(c.forside.heroBilde, 1600) %>"
+           <% if (bildeSrcset(c.forside.heroBilde)) { %>srcset="<%= bildeSrcset(c.forside.heroBilde) %>" sizes="100vw"<% } %>
+           alt="<%= bildeAlt(c.forside.heroBilde, 'Malerarbeid utført av Eid Malerservice') %>"
+           width="1600" height="1200" fetchpriority="high" decoding="async">
+    </div>
+    <div class="hero__slor"></div>
+
+    <div class="hero__inn">
+      <p class="hero__over"><%= c.forside.heroOvertittel %></p>
+      <h1><%= c.forside.heroTittel %></h1>
+      <p class="hero__ingress"><%= c.forside.heroIngress %></p>
+      <div class="hero__knappar">
+        <a class="knapp" href="/kontakt#skjema"><%= c.forside.heroCta %></a>
+        <a class="knapp knapp--open" href="<%= telefonLenke(c.bedrift.telefon) %>">
+          <%= c.forside.heroCtaSekundar %> · <%= c.bedrift.telefon %>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__tal">
+      <% (c.forside.nokkeltall || []).forEach(function (n) { %>
+        <div>
+          <b <% if (/^\d+$/.test(n.tall) && Number(n.tall) < 1900) { %>data-tel="<%= n.tall %>" data-tekst="<%= n.tall %>"<% } %>><%= n.tall %></b>
+          <span><%= n.tekst %></span>
+        </div>
+      <% }); %>
+    </div>
+  </section>
+
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140" loading="lazy">
+        <span class="stikk">Tjenester</span>
+        <h2><%= c.forside.tjenesterTittel %></h2>
+        <p><%= c.forside.tjenesterIngress %></p>
+      </div>
+
+      <div class="kort-rutenett">
+        <% (c.tjenester || []).forEach(function (t, i) { %>
+          <a class="kort avslor" href="/tjenester#<%= t.id %>">
+            <span class="kort__nr"><%= String(i + 1).padStart(2, '0') %></span>
+            <h3><%= t.navn %></h3>
+            <p><%= t.kort %></p>
+            <span class="kort__meir">Les mer
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M13.2 5.6 19.6 12l-6.4 6.4-1.4-1.4 4-4H4v-2h11.8l-4-4 1.4-1.4Z"/></svg>
+            </span>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <section class="seksjon seksjon--tone seksjon--tekstur">
+    <img class="seksjon__tekstur" src="/img/tekstur-1600.webp" alt="" width="1600" height="893" loading="lazy" decoding="async" aria-hidden="true">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <span class="stikk">Hvorfor oss</span>
+        <h2><%= c.forside.hvorforTittel %></h2>
+      </div>
+      <div class="punkt-rutenett">
+        <% (c.forside.hvorforPunkter || []).forEach(function (p, i) { %>
+          <div class="punkt avslor">
+            <h3><%= p.tittel %></h3>
+            <p><%= p.tekst %></p>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <% if ((c.forside.fargevegg || []).length) { %>
+  <section class="seksjon">
+    <div class="wrap fargevegg">
+      <div class="fargevegg__flate avslor">
+        <% (c.forside.fargevegg || []).forEach(function (f, i) { %>
+          <div class="fargevegg__lag lag-<%= i %> <%= i === 0 ? 'fargevegg__lag--paa' : '' %>"
+               id="lag-<%= i %>"></div>
+        <% }); %>
+        <div class="fargevegg__logo">
+          <img src="/img/logo.png" alt="" width="1039" height="490" loading="lazy">
+        </div>
+        <p class="fargevegg__namn" id="fargeNamn"><%= c.forside.fargevegg[0].navn %></p>
+      </div>
+
+      <div class="avslor">
+        <span class="stikk">Fargevalg</span>
+        <h2><%= c.forside.fargeveggTittel %></h2>
+        <p class="t-dempa"><%= c.forside.fargeveggIngress %></p>
+        <ul class="fargevegg__val">
+          <% (c.forside.fargevegg || []).forEach(function (f, i) { %>
+            <li>
+              <button type="button" class="farge-knapp farge-<%= i %>"
+                      data-lag="lag-<%= i %>" data-namn="<%= f.navn %>"
+                      aria-pressed="<%= i === 0 ? 'true' : 'false' %>">
+                <span class="visuelt-skjult"><%= f.navn %></span>
+              </button>
+            </li>
+          <% }); %>
+        </ul>
+        <p class="mt-1"><a class="knapp knapp--open" href="/kontakt#skjema">Snakk med oss om farger</a></p>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <% if ((c.galleri || []).length) { %>
+  <section class="seksjon seksjon--tone">
+    <div class="wrap">
+      <div class="seksjon__topp">
+        <span class="stikk">Utvalgte arbeider</span>
+        <h2>Fra jobber vi har gjort</h2>
+      </div>
+      <div class="galleri">
+        <% (c.galleri || []).slice(0, 3).forEach(function (g, i) { %>
+          <figure class="avslor">
+            <img src="<%= bildeUrl(g.bilde) %>"
+                 <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
+                 alt="<%= g.tekst %>" width="1200" height="900" loading="lazy" decoding="async">
+            <figcaption><%= g.tekst %></figcaption>
+          </figure>
+        <% }); %>
+      </div>
+      <p class="t-midt mt-3">
+        <a class="knapp knapp--open" href="/prosjekter">Se flere prosjekter</a>
+      </p>
+    </div>
+  </section>
+  <% } %>
+
+  <section class="seksjon">
+    <div class="wrap">
+      <div class="band avslor">
+        <img class="ornament" src="/img/ornament.png" alt="" width="495" height="140" loading="lazy">
+        <h2><%= c.forside.ctaTittel %></h2>
+        <p><%= c.forside.ctaTekst %></p>
+        <div class="band__knappar">
+          <a class="knapp" href="/kontakt#skjema">Be om tilbud</a>
+          <a class="knapp knapp--open" href="<%= telefonLenke(c.bedrift.telefon) %>">Ring <%= c.bedrift.telefon %></a>
+        </div>
+        <img class="ornament ornament--botn" src="/img/ornament.png" alt="" width="495" height="140" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('partials/footer') %>
+</body>
+</html>
