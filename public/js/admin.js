@@ -10,6 +10,18 @@
   var aktivFane = 'oversikt';
   var uLagra = false;
 
+  // Går økta ut medan panelet står ope, svarar serveren 401. Då sender vi
+  // brukaren til innlogginga i staden for å vise ei kryptisk feilmelding.
+  function hent(url, val) {
+    return fetch(url, val).then(function (r) {
+      if (r.status === 401) {
+        window.location.href = '/admin/login';
+        throw new Error('Økta er utgått – logg inn på nytt');
+      }
+      return r;
+    });
+  }
+
   var ut = document.getElementById('admInnhald');
   var statusFelt = document.getElementById('lagreStatus');
   var lagreKnapp = document.getElementById('lagreKnapp');
@@ -235,7 +247,7 @@
 
         var data = new FormData();
         data.append('fil', fil);
-        fetch('/admin/api/bilete', { method: 'POST', body: data })
+        hent('/admin/api/bilete', { method: 'POST', body: data })
           .then(function (r) { return r.json(); })
           .then(function (svar) {
             if (svar.feil) throw new Error(svar.feil);
@@ -649,7 +661,7 @@
         k.appendChild(lag('div', 'bibliotek__namn', bi.fil));
         k.appendChild(knapp('Slett', 'bibliotek__slett', function () {
           if (!confirm('Slette dette bildet? Det forsvinner fra alle steder det er brukt.')) return;
-          fetch('/admin/api/bilete/' + encodeURIComponent(bi.fil), { method: 'DELETE' })
+          hent('/admin/api/bilete/' + encodeURIComponent(bi.fil), { method: 'DELETE' })
             .then(function (r) { return r.json(); })
             .then(function () { return hentBilete(true); })
             .then(function () { tegn(); });
@@ -762,7 +774,7 @@
   }
 
   function lagreMeldingar() {
-    fetch('/admin/api/meldingar', {
+    hent('/admin/api/meldingar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(window.__meldingar),
@@ -782,7 +794,7 @@
     statusFelt.classList.remove('adm__status--feil');
     statusFelt.textContent = 'Lagrer …';
     lagreKnapp.disabled = true;
-    fetch('/admin/api/innhald', {
+    hent('/admin/api/innhald', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(innhald),
@@ -810,7 +822,7 @@
   var biletHenta = false;
   function hentBilete(tvingn) {
     if (biletHenta && !tvingn) return Promise.resolve();
-    return fetch('/admin/api/bilete')
+    return hent('/admin/api/bilete')
       .then(function (r) { return r.json(); })
       .then(function (svar) {
         if (svar.feil) throw new Error(svar.feil);
@@ -823,8 +835,8 @@
   /* ---------- oppstart ---------- */
 
   Promise.all([
-    fetch('/admin/api/innhald').then(function (r) { return r.json(); }),
-    fetch('/admin/api/meldingar-liste').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
+    hent('/admin/api/innhald').then(function (r) { return r.json(); }),
+    hent('/admin/api/meldingar-liste').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
     hentBilete(),
   ]).then(function (svar) {
     innhald = svar[0];
