@@ -43,7 +43,9 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Content-Security-Policy',
-    "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'");
+    // blob: trengst for at admin skal kunne vise eit opplasta bilete med ein gong,
+    // før det er sendt til serveren.
+    "default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'");
   next();
 });
 
@@ -87,9 +89,27 @@ function telefonLenke(tlf) {
   return 'tel:+47' + String(tlf || '').replace(/\s/g, '');
 }
 
+// Serialiserer eit objekt trygt til bruk inne i ein <script>-tagg.
+// JSON.stringify escapar ikkje '<', så utan dette kunne teksten "</script>"
+// i eit admin-felt avslutte blokka og sleppe HTML ut på alle sider.
+const U2028 = String.fromCharCode(0x2028);
+const U2029 = String.fromCharCode(0x2029);
+function jsonTrygg(obj) {
+  return JSON.stringify(obj)
+    .split('<').join('\\u003c')
+    .split(U2028).join('\\u2028')
+    .split(U2029).join('\\u2029');
+}
+
 // Felles data til alle visningar
 function visning(req, side) {
-  const c = store.getContent();
+  const c = store.getContent() || {};
+  // Siste sikringsnett: sjølv om innhaldet skulle vere ufullstendig, skal sida
+  // kome opp med tomme felt heller enn å svare 500.
+  if (!c.bedrift) c.bedrift = {};
+  if (!c.forside) c.forside = {};
+  if (!c.omOss) c.omOss = {};
+  if (!c.kontakt) c.kontakt = {};
   return {
     c,
     side,
@@ -97,6 +117,7 @@ function visning(req, side) {
     bildeSrcset,
     bildeAlt,
     telefonLenke,
+    jsonTrygg,
     esc,
     noindex: NOINDEX,
     baseUrl: BASE_URL,
@@ -116,14 +137,21 @@ app.get('/kontakt', (req, res) => {
   const v = visning(req, 'kontakt');
   v.sendt = req.query.sendt === '1';
   v.feil = req.query.feil === '1';
-  v.skjema = {};
+  // Lenkene frå tenestesidene sender med kva tenesta gjeld, så feltet står ferdig valt
+  v.valdTeneste = typeof req.query.tjeneste === 'string' ? req.query.tjeneste : '';
   res.render('kontakt', v);
 });
 
 // Kontaktskjema. Meldingar blir lagra i data-greina og vist i admin.
 const skjemaForsok = new Map();
+// Rydd gamle oppføringar, elles veks mappet med éi rad per unik IP for alltid
+setInterval(() => {
+  const no = Date.now();
+  for (const [ip, f] of skjemaForsok) if (no >= f.resetAt) skjemaForsok.delete(ip);
+}, 30 * 60 * 1000).unref();
+
 app.post('/kontakt', async (req, res) => {
-  const ip = req.ip || 'ukjent';
+  const ip = auth.klientIp(req);
   const no = Date.now();
   const f = skjemaForsok.get(ip);
   if (f && no < f.resetAt && f.count >= 5) {
@@ -212,7 +240,7 @@ app.get('/admin/login', (req, res) => {
 });
 
 app.post('/admin/login', (req, res) => {
-  const ip = req.ip || 'ukjent';
+  const ip = auth.klientIp(req);
   if (auth.rateLimited(ip)) return res.redirect('/admin/login?laast=1');
   const ok = auth.checkPassword(req.body.passord || '');
   auth.registerAttempt(ip, ok);
@@ -231,7 +259,7 @@ app.get('/admin', auth.requireAdmin, (req, res) => {
     c: store.getContent(),
     meldingar: store.getMessages(),
     innebygde: INNEBYGDE_BILETE,
-    lagringsmodus: store.remote ? 'GitHub' : 'lokalt',
+    lagringsmodus: store.erDegradert() ? 'utilgjengeleg' : (store.remote ? 'GitHub' : 'lokalt'),
     noindex: NOINDEX,
   });
 });
@@ -240,10 +268,44 @@ app.get('/admin/api/innhald', auth.requireAdmin, (req, res) => {
   res.json(store.getContent());
 });
 
+// Sjekkar at innhaldet har den forma visningane reknar med. Utan dette kunne
+// eit feilforma lagringskall ta ned alle sidene med 500 - og admin-panelet med,
+// slik at feilen ikkje lét seg rette utan å gå i databasen for hand.
+function validerInnhald(c) {
+  const feil = [];
+  const erObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+  if (!erObj(c)) return ['Innhaldet må vere eit objekt'];
+  for (const n of ['bedrift', 'varsel', 'forside', 'omOss', 'kontakt', 'seo']) {
+    if (!erObj(c[n])) feil.push(`«${n}» manglar eller har feil form`);
+  }
+  for (const n of ['tjenester', 'galleri', 'omtaler']) {
+    if (!Array.isArray(c[n])) feil.push(`«${n}» må vere ei liste`);
+  }
+  if (erObj(c.forside)) {
+    for (const n of ['nokkeltall', 'hvorforPunkter', 'fargevegg']) {
+      if (!Array.isArray(c.forside[n])) feil.push(`«forside.${n}» må vere ei liste`);
+    }
+  }
+  if (erObj(c.bedrift) && !Array.isArray(c.bedrift.apningstider)) {
+    feil.push('«bedrift.apningstider» må vere ei liste');
+  }
+  if (Array.isArray(c.tjenester) && c.tjenester.some((t) => !erObj(t))) {
+    feil.push('Kvar teneste må vere eit objekt');
+  }
+  if (Array.isArray(c.galleri) && c.galleri.some((g) => !erObj(g))) {
+    feil.push('Kvart galleribilete må vere eit objekt');
+  }
+  if (Array.isArray(c.forside && c.forside.fargevegg) && c.forside.fargevegg.some((f) => !erObj(f))) {
+    feil.push('Kvar farge må vere eit objekt');
+  }
+  return feil;
+}
+
 app.post('/admin/api/innhald', auth.requireAdmin, async (req, res) => {
   const nytt = req.body;
-  if (!nytt || typeof nytt !== 'object' || !nytt.bedrift) {
-    return res.status(400).json({ feil: 'Ugyldig innhald' });
+  const feil = validerInnhald(nytt);
+  if (feil.length) {
+    return res.status(400).json({ feil: 'Innhaldet vart ikkje lagra: ' + feil.join('. ') });
   }
   try {
     await store.saveContent(nytt);
@@ -256,8 +318,14 @@ app.post('/admin/api/innhald', auth.requireAdmin, async (req, res) => {
 
 const opplast = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 12 * 1024 * 1024 },
+  limits: { fileSize: 12 * 1024 * 1024, files: 1 },
 });
+
+// Eit lite, men ekstremt høgoppløyst bilete kan blåse opp minnebruken langt over
+// det ein 512 MB-instans toler. Vi held oss difor til éin sharp-jobb om gongen og
+// avviser bilete over 40 megapiksel (langt over det eit mobilkamera lagar).
+sharp.concurrency(1);
+const MAKS_PIKSLAR = 40e6;
 
 // Mediebiblioteket: innebygde bilete + alle opplasta
 app.get('/admin/api/bilete', auth.requireAdmin, async (req, res) => {
@@ -277,7 +345,7 @@ app.get('/admin/api/bilete', auth.requireAdmin, async (req, res) => {
 app.post('/admin/api/bilete', auth.requireAdmin, opplast.single('fil'), async (req, res) => {
   if (!req.file) return res.status(400).json({ feil: 'Ingen fil' });
   try {
-    const webp = await sharp(req.file.buffer)
+    const webp = await sharp(req.file.buffer, { limitInputPixels: MAKS_PIKSLAR })
       .rotate()
       .resize({ width: 1600, withoutEnlargement: true })
       .webp({ quality: 76, effort: 5 })
@@ -333,6 +401,12 @@ store.init()
   .catch((e) => {
     console.error('Klarte ikkje initialisere lageret, køyrer på standardinnhald:', e.message);
     store.initFallback();
+    // Sida er oppe, men all lagring er sperra til vi veit kva som ligg i lageret.
+    // Prøv på nytt med jamne mellomrom, så løyser det seg av seg sjølv.
+    const prov = setInterval(() => {
+      store.proevIgjen().then((ok) => { if (ok) clearInterval(prov); });
+    }, 60 * 1000);
+    prov.unref();
   })
   .finally(() => {
     app.listen(PORT, () => console.log(`Køyrer på port ${PORT} (${BASE_URL}), noindex=${NOINDEX}`));

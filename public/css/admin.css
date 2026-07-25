@@ -247,3 +247,7 @@
   .adm__innhald { padding: 1.2rem 1rem 4rem; }
   .element { grid-template-columns: 1fr; }
 }
+
+/* Lagring nede: raud prikk i staden for grøn */
+.adm__lagringsmodus.er-nede { color: var(--raud); }
+.adm__lagringsmodus.er-nede .adm__prikk { background: var(--raud); }

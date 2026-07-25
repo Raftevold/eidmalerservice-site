@@ -14,9 +14,10 @@
         <p>Et utvalg bilder fra oppdrag vi har utført. Alle bildene er hentet fra vår egen Facebook-side.</p>
       </div>
 
-      <% if ((c.galleri || []).length) { %>
+      <% var galleri = Array.isArray(c.galleri) ? c.galleri : []; %>
+      <% if (galleri.length) { %>
         <div class="galleri">
-          <% (c.galleri || []).forEach(function (g, i) { %>
+          <% galleri.forEach(function (g, i) { %>
             <figure class="avslor">
               <img src="<%= bildeUrl(g.bilde) %>"
                    <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
@@ -29,13 +30,14 @@
         <p class="t-midt t-dempa">Ingen bilder er lagt inn ennå.</p>
       <% } %>
 
-      <% if ((c.omtaler || []).length) { %>
+      <% var omtaler = Array.isArray(c.omtaler) ? c.omtaler : []; %>
+      <% if (omtaler.length) { %>
         <div class="seksjon__topp mt-4">
           <span class="stikk">Tilbakemeldinger</span>
           <h2>Hva kundene sier</h2>
         </div>
         <div class="kort-rutenett">
-          <% (c.omtaler || []).forEach(function (o, i) { %>
+          <% omtaler.forEach(function (o, i) { %>
             <blockquote class="kort avslor">
               <p class="t-kritt">«<%= o.tekst %>»</p>
               <footer class="sitat-kjelde"><%= o.navn %><% if (o.kilde) { %> <span class="t-dempa">· <%= o.kilde %></span><% } %></footer>

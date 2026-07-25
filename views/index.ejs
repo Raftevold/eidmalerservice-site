@@ -28,7 +28,7 @@
     </div>
 
     <div class="hero__tal">
-      <% (c.forside.nokkeltall || []).forEach(function (n) { %>
+      <% (Array.isArray(c.forside.nokkeltall) ? c.forside.nokkeltall : []).forEach(function (n) { %>
         <div>
           <b <% if (/^\d+$/.test(n.tall) && Number(n.tall) < 1900) { %>data-tel="<%= n.tall %>" data-tekst="<%= n.tall %>"<% } %>><%= n.tall %></b>
           <span><%= n.tekst %></span>
@@ -47,7 +47,7 @@
       </div>
 
       <div class="kort-rutenett">
-        <% (c.tjenester || []).forEach(function (t, i) { %>
+        <% (Array.isArray(c.tjenester) ? c.tjenester : []).forEach(function (t, i) { %>
           <a class="kort avslor" href="/tjenester#<%= t.id %>">
             <span class="kort__nr"><%= String(i + 1).padStart(2, '0') %></span>
             <h3><%= t.navn %></h3>
@@ -69,7 +69,7 @@
         <h2><%= c.forside.hvorforTittel %></h2>
       </div>
       <div class="punkt-rutenett">
-        <% (c.forside.hvorforPunkter || []).forEach(function (p, i) { %>
+        <% (Array.isArray(c.forside.hvorforPunkter) ? c.forside.hvorforPunkter : []).forEach(function (p, i) { %>
           <div class="punkt avslor">
             <h3><%= p.tittel %></h3>
             <p><%= p.tekst %></p>
@@ -79,18 +79,19 @@
     </div>
   </section>
 
-  <% if ((c.forside.fargevegg || []).length) { %>
+  <% var fargar = Array.isArray(c.forside.fargevegg) ? c.forside.fargevegg.filter(function (f) { return f && typeof f === 'object'; }) : []; %>
+  <% if (fargar.length) { %>
   <section class="seksjon">
     <div class="wrap fargevegg">
       <div class="fargevegg__flate avslor">
-        <% (c.forside.fargevegg || []).forEach(function (f, i) { %>
+        <% fargar.forEach(function (f, i) { %>
           <div class="fargevegg__lag lag-<%= i %> <%= i === 0 ? 'fargevegg__lag--paa' : '' %>"
                id="lag-<%= i %>"></div>
         <% }); %>
         <div class="fargevegg__logo">
           <img src="/img/logo.png" alt="" width="1039" height="490" loading="lazy">
         </div>
-        <p class="fargevegg__namn" id="fargeNamn"><%= c.forside.fargevegg[0].navn %></p>
+        <p class="fargevegg__namn" id="fargeNamn"><%= fargar[0].navn %></p>
       </div>
 
       <div class="avslor">
@@ -98,7 +99,7 @@
         <h2><%= c.forside.fargeveggTittel %></h2>
         <p class="t-dempa"><%= c.forside.fargeveggIngress %></p>
         <ul class="fargevegg__val">
-          <% (c.forside.fargevegg || []).forEach(function (f, i) { %>
+          <% fargar.forEach(function (f, i) { %>
             <li>
               <button type="button" class="farge-knapp farge-<%= i %>"
                       data-lag="lag-<%= i %>" data-namn="<%= f.navn %>"
@@ -114,7 +115,8 @@
   </section>
   <% } %>
 
-  <% if ((c.galleri || []).length) { %>
+  <% var galleri = Array.isArray(c.galleri) ? c.galleri : []; %>
+  <% if (galleri.length) { %>
   <section class="seksjon seksjon--tone">
     <div class="wrap">
       <div class="seksjon__topp">
@@ -122,7 +124,7 @@
         <h2>Fra jobber vi har gjort</h2>
       </div>
       <div class="galleri">
-        <% (c.galleri || []).slice(0, 3).forEach(function (g, i) { %>
+        <% galleri.slice(0, 3).forEach(function (g, i) { %>
           <figure class="avslor">
             <img src="<%= bildeUrl(g.bilde) %>"
                  <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>

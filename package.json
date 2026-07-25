@@ -1,13 +1,14 @@
 {
   "name": "site",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Nettside med admin for Eid Malerservice AS (demo)",
+  "main": "server.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "prep-images": "node scripts/prep-images.js"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +21,8 @@
     "express": "^5.2.1",
     "multer": "^2.2.0",
     "sharp": "^0.35.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

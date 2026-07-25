@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/css/innhald.css">
 <noscript><link rel="stylesheet" href="/css/utan-js.css"></noscript>
 <script type="application/ld+json">
-<%- JSON.stringify({
+<%- jsonTrygg({
   "@context": "https://schema.org",
   "@type": "HousePainter",
   "name": c.bedrift.navn,
@@ -37,7 +37,7 @@
   "areaServed": { "@type": "Place", "name": "Nordfjord, Vestland" },
   "foundingDate": "2008",
   "sameAs": [c.bedrift.facebook, c.bedrift.instagram].filter(Boolean),
-  "makesOffer": (c.tjenester || []).map(function (t) {
+  "makesOffer": (Array.isArray(c.tjenester) ? c.tjenester : []).map(function (t) {
     return { "@type": "Offer", "itemOffered": { "@type": "Service", "name": t.navn, "description": t.kort } };
   })
 }) %>

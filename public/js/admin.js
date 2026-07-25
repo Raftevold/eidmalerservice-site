@@ -231,6 +231,10 @@
     });
     input.addEventListener('change', function () { handterFiler(input.files); });
 
+    // Éin opplasting om gongen. Slepper ein inn fem store kamerabilete samtidig,
+    // ville parallelle sharp-jobbar kunne sprengje minnet på den vesle instansen.
+    var opplastKoe = Promise.resolve();
+
     function handterFiler(filer) {
       Array.prototype.forEach.call(filer, function (fil) {
         if (!/^image\//.test(fil.type)) return;
@@ -247,7 +251,9 @@
 
         var data = new FormData();
         data.append('fil', fil);
-        hent('/admin/api/bilete', { method: 'POST', body: data })
+        opplastKoe = opplastKoe.then(function () {
+          return hent('/admin/api/bilete', { method: 'POST', body: data });
+        })
           .then(function (r) { return r.json(); })
           .then(function (svar) {
             if (svar.feil) throw new Error(svar.feil);
@@ -839,7 +845,22 @@
     hent('/admin/api/meldingar-liste').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
     hentBilete(),
   ]).then(function (svar) {
-    innhald = svar[0];
+    // Manglar eit felt (t.d. etter ei feilslått lagring), skal panelet framleis
+    // kunne opnast og brukast til å rette opp - ikkje krasje.
+    innhald = svar[0] && typeof svar[0] === 'object' ? svar[0] : {};
+    if (!innhald.bedrift) innhald.bedrift = {};
+    if (!Array.isArray(innhald.bedrift.apningstider)) innhald.bedrift.apningstider = [];
+    if (!innhald.varsel) innhald.varsel = { aktiv: false, tekst: '', lenke: '' };
+    if (!innhald.forside) innhald.forside = {};
+    ['nokkeltall', 'hvorforPunkter', 'fargevegg'].forEach(function (n) {
+      if (!Array.isArray(innhald.forside[n])) innhald.forside[n] = [];
+    });
+    ['tjenester', 'galleri', 'omtaler'].forEach(function (n) {
+      if (!Array.isArray(innhald[n])) innhald[n] = [];
+    });
+    if (!innhald.omOss) innhald.omOss = {};
+    if (!innhald.kontakt) innhald.kontakt = {};
+    if (!innhald.seo) innhald.seo = {};
     window.__meldingar = Array.isArray(svar[1]) ? svar[1] : [];
     tegn();
   }).catch(function (e) {

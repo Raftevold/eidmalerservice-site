@@ -14,7 +14,7 @@
         <p>Vi tar store og små oppdrag for private og bedrifter, på nybygg og rehabilitering – i Nordfjordeid og resten av Nordfjord.</p>
       </div>
 
-      <% (c.tjenester || []).forEach(function (t, i) { %>
+      <% (Array.isArray(c.tjenester) ? c.tjenester : []).forEach(function (t, i) { %>
         <article class="tenestebolk <%= i % 2 === 1 ? 'tenestebolk--snu' : '' %> avslor" id="<%= t.id %>">
           <div class="tenestebolk__media">
             <% if (t.bilde && bildeUrl(t.bilde)) { %>

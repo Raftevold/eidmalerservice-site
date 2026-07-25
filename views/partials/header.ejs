@@ -19,11 +19,19 @@
 
     <nav class="nav" id="hovudnav" aria-label="Hovedmeny">
       <ul>
-        <li><a href="/" <%= side === 'forside' ? 'aria-current="page"' : '' %>>Hjem</a></li>
-        <li><a href="/tjenester" <%= side === 'tjenester' ? 'aria-current="page"' : '' %>>Tjenester</a></li>
-        <li><a href="/prosjekter" <%= side === 'prosjekter' ? 'aria-current="page"' : '' %>>Prosjekter</a></li>
-        <li><a href="/om-oss" <%= side === 'om-oss' ? 'aria-current="page"' : '' %>>Om oss</a></li>
-        <li><a href="/kontakt" <%= side === 'kontakt' ? 'aria-current="page"' : '' %>>Kontakt</a></li>
+        <%
+          // Attributtet må skrivast uescapa, elles blir hermeteikna til &#34;
+          // og skjermlesarar oppfattar ikkje kva side ein står på.
+          var menyval = [
+            ['/', 'forside', 'Hjem'],
+            ['/tjenester', 'tjenester', 'Tjenester'],
+            ['/prosjekter', 'prosjekter', 'Prosjekter'],
+            ['/om-oss', 'om-oss', 'Om oss'],
+            ['/kontakt', 'kontakt', 'Kontakt'],
+          ];
+          menyval.forEach(function (m) { %>
+          <li><a href="<%= m[0] %>"<% if (side === m[1]) { %> aria-current="page"<% } %>><%= m[2] %></a></li>
+        <% }); %>
       </ul>
     </nav>
 

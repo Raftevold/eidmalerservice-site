@@ -48,10 +48,10 @@
               <label for="tjeneste">Hva gjelder det?</label>
               <select id="tjeneste" name="tjeneste">
                 <option value="">Velg gjerne en tjeneste</option>
-                <% (c.tjenester || []).forEach(function (t) { %>
-                  <option value="<%= t.navn %>"><%= t.navn %></option>
+                <% (Array.isArray(c.tjenester) ? c.tjenester : []).forEach(function (t) { %>
+                  <option value="<%= t.navn %>"<% if (valdTeneste === t.navn) { %> selected<% } %>><%= t.navn %></option>
                 <% }); %>
-                <option value="Annet">Annet</option>
+                <option value="Annet"<% if (valdTeneste === 'Annet') { %> selected<% } %>>Annet</option>
               </select>
             </div>
 
@@ -98,7 +98,7 @@
 
           <h2 class="mt-2">Åpningstider</h2>
           <ul class="info-liste">
-            <% (c.bedrift.apningstider || []).forEach(function (a) { %>
+            <% (Array.isArray(c.bedrift.apningstider) ? c.bedrift.apningstider : []).forEach(function (a) { %>
               <li><span class="etikett"><%= a.dag %></span><span><%= a.tid %></span></li>
             <% }); %>
           </ul>

@@ -19,8 +19,15 @@
   </a>
 
   <div class="adm__topphandling">
-    <span class="adm__lagringsmodus" title="Hvor innholdet lagres">
-      <span class="adm__prikk"></span> Lagres <%= lagringsmodus === 'GitHub' ? 'trygt i skyen' : 'lokalt (utvikling)' %>
+    <span class="adm__lagringsmodus<%= lagringsmodus === 'utilgjengeleg' ? ' er-nede' : '' %>" title="Hvor innholdet lagres">
+      <span class="adm__prikk"></span>
+      <% if (lagringsmodus === 'utilgjengeleg') { %>
+        Lagring utilgjengelig – prøv igjen om litt
+      <% } else if (lagringsmodus === 'GitHub') { %>
+        Lagres trygt i skyen
+      <% } else { %>
+        Lagres lokalt (utvikling)
+      <% } %>
     </span>
     <span id="lagreStatus" class="adm__status" role="status" aria-live="polite"></span>
     <button type="button" class="knapp knapp--liten" id="lagreKnapp">Lagre endringer</button>
