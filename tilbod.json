@@ -1,5 +1,5 @@
 {
-  "teljar": 1001,
+  "teljar": 1002,
   "prisbank": [
     {
       "tekst": "riving av gammelt gulv",
@@ -7,9 +7,96 @@
       "einingspris": 100,
       "tal": 1,
       "sist": "2026-07-25T07:59:45.935Z"
+    },
+    {
+      "tekst": "Riving av eksisterende gulvbelegg",
+      "eining": "m2",
+      "einingspris": 100,
+      "tal": 1,
+      "sist": "2026-07-25T21:51:34.674Z"
+    },
+    {
+      "tekst": "Avretting og klargjøring av underlag",
+      "eining": "m2",
+      "einingspris": 200,
+      "tal": 1,
+      "sist": "2026-07-25T21:51:34.674Z"
+    },
+    {
+      "tekst": "Legging av belegg",
+      "eining": "m2",
+      "einingspris": 50,
+      "tal": 1,
+      "sist": "2026-07-25T21:51:34.674Z"
+    },
+    {
+      "tekst": "Sveising av skjøter",
+      "eining": "lm",
+      "einingspris": 100,
+      "tal": 1,
+      "sist": "2026-07-25T21:51:34.674Z"
     }
   ],
   "tilbod": [
+    {
+      "nr": 1001,
+      "opprettet": "2026-07-25T21:51:34.674Z",
+      "status": "kladd",
+      "oppdatert": "2026-07-25T21:51:34.674Z",
+      "kunde": {
+        "navn": "Tore",
+        "adresse": "tasf 23",
+        "postnr": "2131",
+        "poststed": "stryb",
+        "epost": "eadfec@mai.com",
+        "telefon": "938213"
+      },
+      "jobb": {
+        "type": "gulvlegging",
+        "bygningstype": "enebolig",
+        "areal": 60,
+        "romtal": 2,
+        "tilstand": "god",
+        "tilkomst": "enkel",
+        "notat": ""
+      },
+      "linjer": [
+        {
+          "tekst": "Riving av eksisterende gulvbelegg",
+          "eining": "m2",
+          "mengd": 60,
+          "einingspris": 100
+        },
+        {
+          "tekst": "Avretting og klargjøring av underlag",
+          "eining": "m2",
+          "mengd": 60,
+          "einingspris": 200
+        },
+        {
+          "tekst": "Legging av belegg",
+          "eining": "m2",
+          "mengd": 60,
+          "einingspris": 50
+        },
+        {
+          "tekst": "Sveising av skjøter",
+          "eining": "lm",
+          "mengd": 10,
+          "einingspris": 100
+        }
+      ],
+      "mvaSats": 25,
+      "gyldigDagar": 30,
+      "atterhald": [
+        "Prisen forutsetter at arbeidsstedet er ryddet og tilgjengelig når vi starter.",
+        "Skjulte skader (råte, fukt, sopp) som først viser seg under arbeidet er ikke med i prisen. Vi varsler før vi utfører slikt arbeid.",
+        "Dersom underlaget krever flere strøk enn forutsatt, avtales dette før arbeidet fortsetter.",
+        "Prisen gjelder i 30 dager fra tilbudsdato.",
+        "Strøm og vann på arbeidsstedet stilles til disposisjon av kunden."
+      ],
+      "utfall": {}
+    },
     {
       "nr": 1000,
       "opprettet": "2026-07-25T07:59:45.935Z",
