@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tilbud <%= t.nr %> – <%= c.bedrift.navn %></title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/cormorant-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/utskrift.css?v=1">
+</head>
+<body>
+
+<div class="ark">
+  <header class="dok-topp">
+    <img class="dok-logo" src="/img/logo.png" alt="<%= c.bedrift.navn %>">
+    <div class="dok-avsendar">
+      <strong><%= c.bedrift.navn %></strong><br>
+      <%= c.bedrift.adresse %><br>
+      <%= c.bedrift.postnr %> <%= c.bedrift.poststed %><br>
+      Tlf. <%= c.bedrift.telefon %><br>
+      <%= c.bedrift.epost %><br>
+      Org.nr. <%= c.bedrift.orgnr %>
+    </div>
+  </header>
+
+  <h1>Tilbud nr. <%= t.nr %></h1>
+  <p class="dok-dato">
+    Dato: <%= dato.toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+    · Gyldig i <%= t.gyldigDagar || 30 %> dager
+  </p>
+
+  <section class="dok-kunde">
+    <h2>Til</h2>
+    <p>
+      <%= (t.kunde && t.kunde.navn) || '' %><br>
+      <% if (t.kunde && t.kunde.adresse) { %><%= t.kunde.adresse %><br><% } %>
+      <% if (t.kunde && (t.kunde.postnr || t.kunde.poststed)) { %><%= t.kunde.postnr || '' %> <%= t.kunde.poststed || '' %><br><% } %>
+      <% if (t.kunde && t.kunde.epost) { %><%= t.kunde.epost %><br><% } %>
+      <% if (t.kunde && t.kunde.telefon) { %><%= t.kunde.telefon %><% } %>
+    </p>
+  </section>
+
+  <% if (t.jobb && t.jobb.notat) { %>
+    <section class="dok-omfang">
+      <h2>Arbeidet gjelder</h2>
+      <p><%= t.jobb.notat %></p>
+    </section>
+  <% } %>
+
+  <table class="dok-tabell">
+    <thead>
+      <tr>
+        <th class="v">Beskrivelse</th>
+        <th class="h">Mengde</th>
+        <th class="h">Enhet</th>
+        <th class="h">Pris</th>
+        <th class="h">Sum</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% sum.linjer.forEach(function (l) { %>
+        <tr>
+          <td class="v"><%= l.tekst %></td>
+          <td class="h"><%= l.mengd %></td>
+          <td class="h"><%= l.eining %></td>
+          <td class="h"><%= (Number(l.einingspris) || 0).toLocaleString('nb-NO') %></td>
+          <td class="h"><%= l.sum.toLocaleString('nb-NO') %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" class="h">Sum eks. mva.</td>
+        <td class="h"><%= sum.netto.toLocaleString('nb-NO') %></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="h">Merverdiavgift <%= sum.sats %> %</td>
+        <td class="h"><%= sum.mva.toLocaleString('nb-NO') %></td>
+      </tr>
+      <tr class="dok-total">
+        <td colspan="4" class="h">Å betale inkl. mva.</td>
+        <td class="h"><%= sum.brutto.toLocaleString('nb-NO') %> kr</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <% if ((t.atterhald || []).length) { %>
+    <section class="dok-atterhald">
+      <h2>Forbehold</h2>
+      <ul>
+        <% (t.atterhald || []).forEach(function (a) { %><li><%= a %></li><% }); %>
+      </ul>
+    </section>
+  <% } %>
+
+  <section class="dok-signatur">
+    <p>Ta kontakt om noe er uklart, eller om dere ønsker endringer i omfanget.</p>
+    <p class="dok-helsing">Med vennlig hilsen<br><strong><%= c.bedrift.navn %></strong></p>
+  </section>
+
+  <footer class="dok-botn">
+    <%= c.bedrift.navn %> · <%= c.bedrift.adresse %>, <%= c.bedrift.postnr %> <%= c.bedrift.poststed %> ·
+    <%= c.bedrift.telefon %> · <%= c.bedrift.epost %> · Org.nr. <%= c.bedrift.orgnr %>
+  </footer>
+</div>
+
+<div class="utskrift-linje">
+  <button type="button" class="knapp" id="skrivUt">Skriv ut / lagre som PDF</button>
+  <a class="knapp knapp--open" href="/admin">Tilbake til admin</a>
+</div>
+
+<script src="/js/utskrift.js?v=1" defer></script>
+</body>
+</html>

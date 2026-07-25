@@ -251,3 +251,78 @@
 /* Lagring nede: raud prikk i staden for grøn */
 .adm__lagringsmodus.er-nede { color: var(--raud); }
 .adm__lagringsmodus.er-nede .adm__prikk { background: var(--raud); }
+
+/* ---------- tilbodsverktøy ---------- */
+.adm__fane--framheva { box-shadow: inset 2px 0 0 var(--gull-mørk); }
+.adm__fane--framheva.er-valgt { box-shadow: inset 2px 0 0 var(--gull); }
+
+.tilbod-topp { display: flex; gap: .7rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.2rem; }
+.tilbod-topp .knapp { margin: 0; }
+
+.metodekort { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.2rem; }
+.metode {
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 6px;
+  padding: 1.2rem; text-align: left; cursor: pointer; font: inherit; color: var(--kritt);
+  transition: transform var(--overgang), border-color var(--overgang);
+}
+.metode:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--gull-mørk); }
+.metode:disabled { opacity: .5; cursor: not-allowed; }
+.metode strong { display: block; font-family: var(--serif); font-size: 1.2rem; color: var(--gull-lys); margin-bottom: .35rem; }
+.metode span { font-size: .87rem; color: var(--dempa); }
+
+.tilbodsliste { display: grid; gap: .7rem; }
+.tilbodsrad {
+  display: grid; grid-template-columns: auto 1fr auto auto; gap: 1rem; align-items: center;
+  background: var(--svart-2); border: 1px solid var(--linje); border-radius: 6px; padding: .9rem 1.1rem;
+}
+.tilbodsrad__nr { font-family: var(--serif); font-size: 1.25rem; color: var(--gull-lys); }
+.tilbodsrad__kunde { min-width: 0; }
+.tilbodsrad__kunde b { display: block; }
+.tilbodsrad__kunde span { font-size: .85rem; color: var(--dempa); }
+.tilbodsrad__sum { font-weight: 650; white-space: nowrap; }
+.tilbodsrad__handling { display: flex; gap: .4rem; }
+
+.merke-status {
+  display: inline-block; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .18rem .5rem; border-radius: 3px; border: 1px solid;
+}
+.merke-kladd { color: var(--dempa); border-color: var(--linje); }
+.merke-sendt { color: var(--gull-lys); border-color: var(--gull-mørk); }
+.merke-akseptert { color: #8fbf7a; border-color: #5f8a4f; }
+.merke-avslatt { color: var(--raud); border-color: var(--raud); }
+
+.linjetabell { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+.linjetabell th {
+  text-align: left; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gull); padding: .4rem .35rem; border-bottom: 1px solid var(--linje); font-weight: 600;
+}
+.linjetabell th.h, .linjetabell td.h { text-align: right; }
+.linjetabell td { padding: .3rem .35rem; border-bottom: 1px solid var(--linje); vertical-align: middle; }
+.linjetabell input, .linjetabell select {
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 3px;
+  color: var(--kritt); padding: .45rem .5rem; font: inherit; font-size: .92rem; width: 100%;
+}
+.linjetabell input:focus, .linjetabell select:focus { border-color: var(--gull); }
+.linjetabell .kol-mengd, .linjetabell .kol-pris { width: 8.5rem; }
+.linjetabell .kol-eining { width: 6.5rem; }
+.linjetabell .kol-sum { width: 7rem; white-space: nowrap; color: var(--kritt); }
+.linjetabell .kol-fjern { width: 2.6rem; }
+.linjegrunn { font-size: .78rem; color: var(--dempa); padding: 0 .35rem .45rem; }
+
+.sumboks {
+  margin-top: 1rem; margin-left: auto; max-width: 22rem;
+  background: var(--svart-3); border: 1px solid var(--linje); border-radius: 6px; padding: 1rem 1.2rem;
+}
+.sumrad { display: flex; justify-content: space-between; gap: 1rem; padding: .22rem 0; font-size: .95rem; }
+.sumrad--total {
+  border-top: 1px solid var(--gull-mørk); margin-top: .5rem; padding-top: .6rem;
+  font-size: 1.15rem; font-weight: 700; color: var(--gull-lys);
+}
+
+.ki-boks { border-color: var(--gull-mørk); }
+.ki-merknad {
+  background: rgba(201,165,94,.1); border: 1px solid var(--gull-mørk); border-radius: 4px;
+  padding: .8rem 1rem; margin-top: .8rem; font-size: .9rem; color: #e0d5c0;
+}
+.ki-av { color: var(--dempa); font-size: .88rem; }
+.arbeider { opacity: .6; pointer-events: none; }

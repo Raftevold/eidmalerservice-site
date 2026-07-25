@@ -749,6 +749,23 @@
     return d;
   };
 
+  faner.tilbud = function () {
+    var d = lag('div', 'adm__seksjon');
+    if (!window.__tilbod) {
+      d.appendChild(lag('p', 'adm__lastar', 'Tilbudsverktøyet kunne ikke lastes.'));
+      return d;
+    }
+    window.__tilbod.tegn(d, {
+      tegn: function () { tegn(); },
+      hent: hent,
+      status: function (tekst, erFeil) {
+        statusFelt.classList.toggle('adm__status--feil', Boolean(erFeil));
+        statusFelt.textContent = tekst;
+      },
+    });
+    return d;
+  };
+
   /* ---------- tegning og lagring ---------- */
 
   function tegn() {
@@ -764,6 +781,9 @@
     });
     if (namn === 'bilder') {
       hentBilete().then(tegn);
+    } else if (namn === 'tilbud' && window.__tilbod) {
+      tegn();
+      window.__tilbod.last(hent).then(tegn);
     } else {
       tegn();
     }
@@ -777,6 +797,8 @@
   function oppdaterTeljar() {
     var ulest = (window.__meldingar || []).filter(function (m) { return !m.lest; }).length;
     document.getElementById('meldingTeljar').textContent = ulest ? String(ulest) : '';
+    var tt = document.getElementById('tilbodTeljar');
+    if (tt && window.__tilbod) tt.textContent = window.__tilbod.tal();
   }
 
   function lagreMeldingar() {

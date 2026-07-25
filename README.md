@@ -16,6 +16,42 @@ Formspråket er henta frå bedrifta sin eigen logo – eit art nouveau-ordmerke 
 
 Animasjonane rører berre `transform` og `opacity`, slik at dei ikkje utløyser omrekning av layout. Alt er slått av under `prefers-reduced-motion: reduce`, og eit `<noscript>`-stilark sørgjer for at alt innhald er synleg sjølv om JavaScript ikkje køyrer.
 
+## Tilbodsverktøy
+
+Admin har ei eiga fane «Tilbud» der bedrifta kan lage tilbod til kundar på tre måtar:
+
+1. **Tomt tilbod** – blanke varelinjer ein fyller ut sjølv.
+2. **Frå mal** – standardlinjer for jobbtypen (innvendig, utvendig, tapetsering,
+   gulvlegging, flislegging, industribelegg), med einingsprisar henta frå prisbanken.
+3. **Utkast med KI** – ein språkmodell foreslår varelinjer ut frå omfanget.
+
+Uansett metode er det mennesket som godkjenner. Tilbodet blir rekna ut med MVA og
+kan skrivast ut som PDF frå nettlesaren i bedrifta sin eigen profil.
+
+**Prisbanken** veks for kvar lagra varelinje: neste gong same arbeidet dukkar opp,
+er prisen bedrifta faktisk brukte allereie fylt inn. Tilboda får status
+kladd → sendt → akseptert/avslått, og ved avslag kan ein registrere grunnen.
+
+### KI-utkastet
+
+Slått av som standard. Set miljøvariabelen `ANTHROPIC_API_KEY` for å aktivere det.
+Utan nøkkel fungerer dei to andre metodane som normalt, og KI-valet er gråa ut
+med ei forklaring.
+
+Modellen får tre ting: omfanget maleren har notert, bedrifta sin eigen prisbank,
+og opptil fem tidlegare tilbod av same jobbtype. **Kundeopplysningar blir aldri
+sende** – dei tidlegare tilboda blir anonymiserte til jobbtype, omfang, varelinjer
+og utfall. Berre aksepterte og sende tilbod blir brukte som døme; avslåtte prisar
+er ikkje noko å lære av.
+
+Modellen er `claude-opus-5`. Sett `AI_MODELL=claude-sonnet-5` for ein rimelegare
+variant som truleg held godt nok for denne oppgåva.
+
+**Datagrunnlag for seinare:** kvart tilbod blir lagra strukturert i `tilbod.json`.
+Knappen «Last ned datagrunnlag (JSONL)» gir eit pseudonymisert datasett med
+jobbtype, omfang, varelinjer, sum og utfall – formatet ein treng for å seinare
+finjustere ein modell eller byggje eit søkbart dømearkiv.
+
 ## Miljøvariablar
 
 | Namn | Forklaring |
@@ -28,6 +64,8 @@ Animasjonane rører berre `transform` og `opacity`, slik at dei ikkje utløyser 
 | `SESSION_SECRET` | Tilfeldig streng for signering av innloggings-cookien |
 | `BASE_URL` | Full adresse til sida, t.d. `https://…onrender.com` |
 | `DEMO_NOINDEX` | `1` (standard) = noindex på alle sider. Sett til `0` ved lansering. |
+| `ANTHROPIC_API_KEY` | Valfri. Slår på KI-utkast i tilbodsverktøyet. |
+| `AI_MODELL` | Valfri. Standard `claude-opus-5`. |
 
 Utan `GITHUB_TOKEN` køyrer serveren i lokal modus og lagrar i `data-local/` (ikkje sjekka inn).
 

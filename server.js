@@ -11,6 +11,7 @@ const crypto = require('crypto');
 
 const store = require('./lib/store');
 const auth = require('./lib/auth');
+const tilbodslib = require('./lib/tilbod');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -443,6 +444,114 @@ app.delete('/admin/api/bilete/:fil', auth.requireAdmin, async (req, res) => {
   } catch (e) {
     res.status(500).json({ feil: e.message });
   }
+});
+
+// ---------- tilbodsverktøy ----------
+
+app.get('/admin/api/tilbod', auth.requireAdmin, (req, res) => {
+  const lager = store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] };
+  res.json({
+    tilbod: lager.tilbod || [],
+    prisbank: lager.prisbank || [],
+    malar: tilbodslib.MALAR,
+    einingar: tilbodslib.EININGAR,
+    standardAtterhald: tilbodslib.STANDARD_ATTERHALD,
+    mvaSats: tilbodslib.MVA_SATS,
+    kiPaa: tilbodslib.kiTilgjengeleg(),
+    modell: tilbodslib.kiTilgjengeleg() ? tilbodslib.MODELL : null,
+  });
+});
+
+app.post('/admin/api/tilbod', auth.requireAdmin, async (req, res) => {
+  const inn = req.body;
+  if (!inn || typeof inn !== 'object' || !Array.isArray(inn.linjer)) {
+    return res.status(400).json({ feil: 'Ugyldig tilbod' });
+  }
+  try {
+    const lager = JSON.parse(JSON.stringify(store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] }));
+    const no = new Date().toISOString();
+    let t = (lager.tilbod || []).find((x) => x.nr === inn.nr);
+    if (!t) {
+      t = { nr: lager.teljar || 1000, opprettet: no };
+      lager.teljar = (lager.teljar || 1000) + 1;
+      lager.tilbod = lager.tilbod || [];
+      lager.tilbod.unshift(t);
+    }
+    Object.assign(t, {
+      status: ['kladd', 'sendt', 'akseptert', 'avslatt'].includes(inn.status) ? inn.status : 'kladd',
+      oppdatert: no,
+      kunde: inn.kunde || {},
+      jobb: inn.jobb || {},
+      linjer: inn.linjer,
+      mvaSats: Number(inn.mvaSats) || tilbodslib.MVA_SATS,
+      gyldigDagar: Number(inn.gyldigDagar) || 30,
+      atterhald: Array.isArray(inn.atterhald) ? inn.atterhald : tilbodslib.STANDARD_ATTERHALD,
+      utfall: inn.utfall || {},
+    });
+    // Kvar lagring gjer prisbanken litt betre for neste gong
+    lager.prisbank = tilbodslib.oppdaterPrisbank(lager.prisbank, inn.linjer);
+    lager.tilbod = lager.tilbod.slice(0, 500);
+    await store.saveTilbod(lager);
+    res.json({ ok: true, nr: t.nr, prisbank: lager.prisbank });
+  } catch (e) {
+    console.error('Lagring av tilbod feila:', e.message);
+    res.status(500).json({ feil: 'Klarte ikkje lagre: ' + e.message });
+  }
+});
+
+app.delete('/admin/api/tilbod/:nr', auth.requireAdmin, async (req, res) => {
+  try {
+    const lager = JSON.parse(JSON.stringify(store.getTilbod() || { teljar: 1000, prisbank: [], tilbod: [] }));
+    lager.tilbod = (lager.tilbod || []).filter((t) => String(t.nr) !== String(req.params.nr));
+    await store.saveTilbod(lager);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ feil: e.message });
+  }
+});
+
+// KI-utkast. Valfritt - krev ANTHROPIC_API_KEY.
+app.post('/admin/api/tilbod/ki', auth.requireAdmin, async (req, res) => {
+  if (!tilbodslib.kiTilgjengeleg()) {
+    return res.status(503).json({ feil: 'KI-utkast er ikkje slått på. Sjå README for korleis du aktiverer det.' });
+  }
+  const jobb = (req.body && req.body.jobb) || {};
+  if (!jobb.type) return res.status(400).json({ feil: 'Vel kva slags jobb det gjeld først.' });
+  try {
+    const lager = store.getTilbod() || { prisbank: [], tilbod: [] };
+    const utkast = await tilbodslib.kiUtkast({
+      jobb,
+      prisbank: lager.prisbank,
+      tidlegare: lager.tilbod,
+    });
+    res.json(utkast);
+  } catch (e) {
+    console.error('KI-utkast feila:', e.message);
+    res.status(502).json({ feil: e.message });
+  }
+});
+
+// Pseudonymisert datagrunnlag for seinare KI-arbeid
+app.get('/admin/api/tilbod/eksport', auth.requireAdmin, (req, res) => {
+  const lager = store.getTilbod() || { tilbod: [] };
+  res.type('application/x-ndjson');
+  res.setHeader('Content-Disposition', 'attachment; filename="tilbod-eksport.jsonl"');
+  res.send(tilbodslib.kiEksport(lager.tilbod));
+});
+
+// Utskriftsvenleg tilbodsdokument
+app.get('/admin/tilbod/:nr/utskrift', auth.requireAdmin, (req, res) => {
+  const lager = store.getTilbod() || { tilbod: [] };
+  const t = (lager.tilbod || []).find((x) => String(x.nr) === String(req.params.nr));
+  if (!t) return res.status(404).send('Fann ikkje tilbodet.');
+  const c = store.getContent() || {};
+  res.render('admin/tilbod-utskrift', {
+    t,
+    sum: tilbodslib.reknUt(t),
+    c,
+    telefonLenke,
+    dato: new Date(t.oppdatert || Date.now()),
+  });
 });
 
 app.get('/admin/api/meldingar-liste', auth.requireAdmin, (req, res) => {

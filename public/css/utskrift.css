@@ -1,0 +1,102 @@
+/* Tilbodsdokument. Lyst og nøytralt på skjerm, reint på papir. */
+
+@font-face {
+  font-family: 'Cormorant';
+  src: url('/fonts/cormorant-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --blekk: #1c1a17;
+  --dempa: #5f584f;
+  --strek: #d8d1c5;
+  --gull: #8d7237;
+  --serif: 'Cormorant', Georgia, 'Times New Roman', serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #efece6;
+  color: var(--blekk);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  padding: 2rem 1rem 6rem;
+}
+
+.ark {
+  background: #fff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3.2rem 3rem;
+  box-shadow: 0 20px 50px -30px rgba(0, 0, 0, .5);
+}
+
+.dok-topp {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem;
+  border-bottom: 2px solid var(--gull); padding-bottom: 1.4rem; margin-bottom: 2rem;
+}
+/* Logofila er kvit, så han må snuast for å synast på kvitt papir */
+.dok-logo { width: 210px; filter: invert(1); }
+.dok-avsendar { font-size: .82rem; color: var(--dempa); text-align: right; line-height: 1.5; }
+
+h1 { font-family: var(--serif); font-size: 2.1rem; margin: 0 0 .2em; font-weight: 600; }
+h2 {
+  font-family: var(--sans); font-size: .78rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--gull); margin: 0 0 .5rem;
+}
+.dok-dato { color: var(--dempa); font-size: .9rem; margin: 0 0 2rem; }
+
+.dok-kunde, .dok-omfang { margin-bottom: 1.8rem; }
+.dok-kunde p, .dok-omfang p { margin: 0; }
+
+.dok-tabell { width: 100%; border-collapse: collapse; margin: 2rem 0 1.6rem; font-size: .93rem; }
+.dok-tabell th, .dok-tabell td { padding: .55rem .5rem; border-bottom: 1px solid var(--strek); }
+.dok-tabell thead th {
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--dempa); border-bottom: 1.5px solid var(--blekk); font-weight: 600;
+}
+.dok-tabell .v { text-align: left; }
+.dok-tabell .h { text-align: right; white-space: nowrap; }
+.dok-tabell tfoot td { border-bottom: 0; padding-top: .5rem; }
+.dok-tabell tfoot tr:first-child td { border-top: 1.5px solid var(--blekk); }
+.dok-total td { font-weight: 700; font-size: 1.08rem; border-top: 1px solid var(--strek); }
+
+.dok-atterhald { margin: 2rem 0; }
+.dok-atterhald ul { margin: 0; padding-left: 1.1rem; color: var(--dempa); font-size: .88rem; }
+.dok-atterhald li { margin-bottom: .35rem; }
+
+.dok-signatur { margin-top: 2.4rem; }
+.dok-helsing { margin-top: 1.6rem; }
+
+.dok-botn {
+  margin-top: 2.6rem; padding-top: 1rem; border-top: 1px solid var(--strek);
+  font-size: .76rem; color: var(--dempa); text-align: center;
+}
+
+/* Knappelinja skal ikkje vere med på papiret */
+.utskrift-linje {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; gap: .8rem; justify-content: center;
+  padding: 1rem; background: rgba(239, 236, 230, .96); border-top: 1px solid var(--strek);
+}
+.utskrift-linje .knapp {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--gull); color: #fff; border: 1px solid var(--gull);
+  padding: .7rem 1.3rem; border-radius: 3px; text-decoration: none;
+  font: inherit; font-weight: 650; cursor: pointer;
+}
+.utskrift-linje .knapp--open { background: #fff; color: var(--blekk); border-color: var(--strek); }
+
+@media print {
+  body { background: #fff; padding: 0; }
+  .ark { box-shadow: none; max-width: none; padding: 0; }
+  .utskrift-linje { display: none; }
+  .dok-tabell { page-break-inside: auto; }
+  .dok-tabell tr { page-break-inside: avoid; }
+}
