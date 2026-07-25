@@ -36,11 +36,6 @@ async function foto(navn, filnamn, breidder) {
       .webp({ quality: 74, effort: 6 })
       .toFile(path.join(OUT, `${navn}-${b}.webp`));
   }
-  await sharp(input)
-    .rotate()
-    .resize({ width: breidder[breidder.length - 1], withoutEnlargement: true })
-    .jpeg({ quality: 76, progressive: true, mozjpeg: true })
-    .toFile(path.join(OUT, `${navn}.jpg`));
   console.log('ok:', navn);
 }
 
