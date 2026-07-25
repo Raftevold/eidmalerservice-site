@@ -11,7 +11,8 @@
       <img src="<%= bildeUrl(c.forside.heroBilde, 1600) %>"
            <% if (bildeSrcset(c.forside.heroBilde)) { %>srcset="<%= bildeSrcset(c.forside.heroBilde) %>" sizes="100vw"<% } %>
            alt="<%= bildeAlt(c.forside.heroBilde, 'Malerarbeid utført av Eid Malerservice') %>"
-           width="1600" height="1200" fetchpriority="high" decoding="async">
+           width="<%= bildeMal(c.forside.heroBilde, 1600).w %>" height="<%= bildeMal(c.forside.heroBilde, 1600).h %>"
+           fetchpriority="high" decoding="async">
     </div>
     <div class="hero__slor"></div>
 
@@ -128,7 +129,8 @@
           <figure class="avslor">
             <img src="<%= bildeUrl(g.bilde) %>"
                  <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
-                 alt="<%= g.tekst %>" width="1200" height="900" loading="lazy" decoding="async">
+                 alt="<%= g.tekst %>" width="<%= bildeMal(g.bilde, 1200).w %>" height="<%= bildeMal(g.bilde, 1200).h %>"
+                 loading="lazy" decoding="async">
             <figcaption><%= g.tekst %></figcaption>
           </figure>
         <% }); %>

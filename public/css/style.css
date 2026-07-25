@@ -247,7 +247,7 @@ a:hover { color: var(--kritt); }
 
 .kort-rutenett {
   display: grid; gap: 1.15rem;
-  grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .kort {
@@ -337,7 +337,7 @@ a:hover { color: var(--kritt); }
 
 /* ---------- galleri ---------- */
 
-.galleri { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.galleri { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
 .galleri figure { margin: 0; position: relative; overflow: hidden; border-radius: var(--rad); border: 1px solid var(--linje); }
 .galleri img { width: 100%; aspect-ratio: 4/3; object-fit: cover; transition: transform 620ms cubic-bezier(.19,1,.22,1); }
 .galleri figure:hover img { transform: scale(1.05); }
@@ -346,8 +346,7 @@ a:hover { color: var(--kritt); }
   background: linear-gradient(0deg, rgba(19,18,17,.92), transparent);
   padding: 2.6rem .95rem .85rem; font-size: .9rem; color: #e8e0d3;
 }
-.galleri figure:first-child { grid-column: span 2; }
-.galleri figure:first-child img { aspect-ratio: 16/9; }
+
 
 /* ---------- CTA-band ---------- */
 
@@ -473,8 +472,7 @@ a:hover { color: var(--kritt); }
   .tenestebolk, .fargevegg, .kontakt-rutenett { grid-template-columns: 1fr; }
   .tenestebolk--snu .tenestebolk__media { order: 0; }
   .botn__grid { grid-template-columns: 1fr 1fr; }
-  .galleri figure:first-child { grid-column: span 1; }
-  .galleri figure:first-child img { aspect-ratio: 4/3; }
+  .galleri, .kort-rutenett { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 760px) {
@@ -507,7 +505,14 @@ a:hover { color: var(--kritt); }
   .hero__tal > div + div { border-left: 0; border-top: 1px solid var(--linje); }
   .hero__tal > div { display: flex; align-items: baseline; justify-content: center; gap: .7rem; padding: 1rem .6rem; }
   .botn__grid { grid-template-columns: 1fr; }
-  .kapsel-melding { bottom: 4.6rem; }
+  .galleri, .kort-rutenett { grid-template-columns: 1fr; }
+  /* Meldinga skal aldri dekkje ring- og tilbodsknappane nedst */
+  .kapsel-melding { bottom: 4.6rem; left: .7rem; right: .7rem; padding: .85rem .9rem; }
+  .kapsel-melding p { font-size: .84rem; }
+  /* Større trykkflater */
+  .botn__liste { gap: .1rem; }
+  .botn__liste a { display: inline-block; padding: .5rem 0; }
+  .kapsel-melding .knapp { min-height: 44px; }
 }
 
 /* ---------- redusert rørsle ---------- */
@@ -583,3 +588,9 @@ a:hover { color: var(--kritt); }
    clip lagar ikkje ein rullecontainer slik hidden gjer. */
 html { overflow-x: clip; }
 body { overflow-x: clip; }
+
+/* Feilliste i kontaktskjemaet */
+.feilliste { margin: .6rem 0 .4rem; padding-left: 1.1rem; }
+.feilliste li { margin-bottom: .3rem; }
+.feilliste a { color: var(--kritt); }
+[aria-invalid="true"] { border-color: var(--raud) !important; }

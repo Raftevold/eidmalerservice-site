@@ -21,7 +21,8 @@
             <figure class="avslor">
               <img src="<%= bildeUrl(g.bilde) %>"
                    <% if (bildeSrcset(g.bilde)) { %>srcset="<%= bildeSrcset(g.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
-                   alt="<%= g.tekst %>" width="1200" height="900" loading="lazy" decoding="async">
+                   alt="<%= g.tekst %>" width="<%= bildeMal(g.bilde, 1200).w %>" height="<%= bildeMal(g.bilde, 1200).h %>"
+                   loading="lazy" decoding="async">
               <figcaption><%= g.tekst %></figcaption>
             </figure>
           <% }); %>

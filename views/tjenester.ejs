@@ -21,7 +21,8 @@
               <img src="<%= bildeUrl(t.bilde) %>"
                    <% if (bildeSrcset(t.bilde)) { %>srcset="<%= bildeSrcset(t.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
                    alt="<%= bildeAlt(t.bilde, t.navn + ' utført av Eid Malerservice') %>"
-                   width="1200" height="900" loading="lazy" decoding="async">
+                   width="<%= bildeMal(t.bilde, 1200).w %>" height="<%= bildeMal(t.bilde, 1200).h %>"
+                   loading="lazy" decoding="async">
             <% } else { %>
               <div class="tenestebolk__utan">
                 <p><strong>PLASSHOLDER</strong><br>Vi mangler et bilde av <%= t.navn.toLowerCase() %>.<br>Last opp ett i admin.</p>

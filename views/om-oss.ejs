@@ -20,7 +20,8 @@
             <img src="<%= bildeUrl(c.omOss.bilde) %>"
                  <% if (bildeSrcset(c.omOss.bilde)) { %>srcset="<%= bildeSrcset(c.omOss.bilde) %>" sizes="(max-width: 940px) 100vw, 50vw"<% } %>
                  alt="<%= bildeAlt(c.omOss.bilde, 'Arbeidslaget i Eid Malerservice') %>"
-                 width="1600" height="1200" loading="lazy" decoding="async">
+                 width="<%= bildeMal(c.omOss.bilde, 1600).w %>" height="<%= bildeMal(c.omOss.bilde, 1600).h %>"
+                 loading="lazy" decoding="async">
           <% } %>
         </div>
         <div class="tekstbolk">

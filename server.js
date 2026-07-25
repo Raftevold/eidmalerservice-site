@@ -19,19 +19,22 @@ const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\
 const NOINDEX = process.env.DEMO_NOINDEX !== '0';
 
 // Bilete som følgjer med i repoet. Admin kan velje desse eller laste opp eigne.
+// forhold = biletet sitt eigne breidde/høgde-forhold. Vi oppgir rett storleik i
+// HTML-en så nettlesaren kan setje av plass før biletet er lasta (unngår hopp).
 const INNEBYGDE_BILETE = {
-  fasade: { alt: 'Maler arbeider med fasade fra lift på næringsbygg', bredder: [900, 1600] },
-  laget: { alt: 'Deler av arbeidslaget foran et større næringsbygg', bredder: [900, 1600] },
-  innvendig: { alt: 'Maler ruller maling på innvendig vegg', bredder: [700, 1200] },
-  golv: { alt: 'Sveising av skjøter i banebelegg på gulv', bredder: [700, 1200] },
-  sproyting: { alt: 'Sprøytemaskin for puss på byggeplass', bredder: [700, 1200] },
-  pauserom: { alt: 'Arbeidslaget i pause på byggeplass', bredder: [700, 1200] },
-  tekstur: { alt: '', bredder: [1600] },
+  fasade: { alt: 'Maler arbeider med fasade fra lift på næringsbygg', bredder: [900, 1600], forhold: 1600 / 1200 },
+  laget: { alt: 'Deler av arbeidslaget foran et større næringsbygg', bredder: [900, 1600], forhold: 1600 / 1205 },
+  innvendig: { alt: 'Maler ruller maling på innvendig vegg', bredder: [700, 1200], forhold: 1200 / 1594 },
+  golv: { alt: 'Maler sveiser skjøter i banebelegg på gulv', bredder: [700, 1200], forhold: 1200 / 1594 },
+  sproyting: { alt: 'Tre av malerne ved en pussemaskin på byggeplass', bredder: [700, 1200], forhold: 1200 / 1594 },
+  pauserom: { alt: 'Arbeidslaget i pause på byggeplass', bredder: [700, 1200], forhold: 1200 / 1594 },
+  tekstur: { alt: '', bredder: [1600], forhold: 1376 / 768 },
 };
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('trust proxy', 1);
+app.disable('x-powered-by');
 app.use(compression());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false, limit: '200kb' }));
@@ -79,6 +82,15 @@ function bildeAlt(navn, fallback) {
   return (b && b.alt) || fallback || '';
 }
 
+// Breidde og høgde å oppgi i HTML. Opplasta bilete er alltid maks 1600 breie,
+// men høgda varierer - då fell vi tilbake på 4:3, som er det figurane viser.
+function bildeMal(navn, breidde) {
+  const b = INNEBYGDE_BILETE[navn];
+  const w = breidde || 1200;
+  const forhold = (b && b.forhold) || 4 / 3;
+  return { w, h: Math.round(w / forhold) };
+}
+
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -116,6 +128,7 @@ function visning(req, side) {
     bildeUrl,
     bildeSrcset,
     bildeAlt,
+    bildeMal,
     telefonLenke,
     jsonTrygg,
     esc,
@@ -133,12 +146,42 @@ app.get('/prosjekter', (req, res) => res.render('prosjekter', visning(req, 'pros
 app.get('/om-oss', (req, res) => res.render('om-oss', visning(req, 'om-oss')));
 app.get('/personvern', (req, res) => res.render('personvern', visning(req, 'personvern')));
 
+// Mellomlager for skjema som ikkje gjekk gjennom, så kunden slepp å skrive alt på
+// nytt. Nøkkelen ligg i ein kortliva cookie; sjølve teksten blir aldri delt.
+const skjemaMinne = new Map();
+setInterval(() => {
+  const no = Date.now();
+  for (const [k, v] of skjemaMinne) if (no >= v.utgaar) skjemaMinne.delete(k);
+}, 10 * 60 * 1000).unref();
+
+function hugsSkjema(res, verdiar) {
+  const nokkel = crypto.randomUUID();
+  skjemaMinne.set(nokkel, { verdiar, utgaar: Date.now() + 30 * 60 * 1000 });
+  while (skjemaMinne.size > 500) skjemaMinne.delete(skjemaMinne.keys().next().value);
+  res.cookie('ems_skjema', nokkel, {
+    httpOnly: true, sameSite: 'lax', maxAge: 30 * 60 * 1000, path: '/kontakt',
+    secure: process.env.NODE_ENV !== 'development',
+  });
+}
+
 app.get('/kontakt', (req, res) => {
   const v = visning(req, 'kontakt');
   v.sendt = req.query.sendt === '1';
-  v.feil = req.query.feil === '1';
+  v.feilkode = typeof req.query.feil === 'string' ? req.query.feil : '';
+  v.feil = Boolean(v.feilkode);
+
+  // Hent tilbake det kunden skreiv, slik at ei feilmelding ikkje tømmer skjemaet
+  v.skjema = { navn: '', epost: '', telefon: '', melding: '', tjeneste: '' };
+  const nokkel = req.cookies && req.cookies.ems_skjema;
+  if (nokkel && skjemaMinne.has(nokkel)) {
+    Object.assign(v.skjema, skjemaMinne.get(nokkel).verdiar);
+    skjemaMinne.delete(nokkel);
+    res.clearCookie('ems_skjema', { path: '/kontakt' });
+  }
+
   // Lenkene frå tenestesidene sender med kva tenesta gjeld, så feltet står ferdig valt
-  v.valdTeneste = typeof req.query.tjeneste === 'string' ? req.query.tjeneste : '';
+  const fraLenke = typeof req.query.tjeneste === 'string' ? req.query.tjeneste : '';
+  v.valdTeneste = v.skjema.tjeneste || fraLenke;
   res.render('kontakt', v);
 });
 
@@ -150,36 +193,68 @@ setInterval(() => {
   for (const [ip, f] of skjemaForsok) if (no >= f.resetAt) skjemaForsok.delete(ip);
 }, 30 * 60 * 1000).unref();
 
+// Enkel, romsleg kontroll: vi vil fange skrivefeil som «kari(at)example.no»,
+// ikkje avvise uvanlege men gyldige adresser.
+function gyldigEpost(s) {
+  return /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(String(s).trim());
+}
+// Norske nummer kan skrivast med mellomrom, bindestrek og landkode
+function gyldigTelefon(s) {
+  const reint = String(s).replace(/[\s\-().]/g, '');
+  return /^(\+?\d{8,15})$/.test(reint);
+}
+
 app.post('/kontakt', async (req, res) => {
   const ip = auth.klientIp(req);
   const no = Date.now();
+
+  const { navn, epost, telefon, melding, tjeneste } = req.body;
+  const verdiar = {
+    navn: String(navn || '').slice(0, 120),
+    epost: String(epost || '').slice(0, 160),
+    telefon: String(telefon || '').slice(0, 40),
+    melding: String(melding || '').slice(0, 4000),
+    tjeneste: String(tjeneste || '').slice(0, 80),
+  };
+
+  // Honeypot mot enkel spam
+  if (req.body.nettside) return res.redirect('/kontakt?sendt=1#skjema');
+
   const f = skjemaForsok.get(ip);
-  if (f && no < f.resetAt && f.count >= 5) {
-    return res.redirect('/kontakt?feil=1#skjema');
+  if (f && no < f.resetAt && f.count >= 20) {
+    // Eiga melding - elles trur kunden at han har gløymt eit felt
+    hugsSkjema(res, verdiar);
+    return res.redirect('/kontakt?feil=for-mange#skjema');
   }
   skjemaForsok.set(ip, { count: (f && no < f.resetAt ? f.count : 0) + 1, resetAt: no + 60 * 60 * 1000 });
 
-  const { navn, epost, telefon, melding, tjeneste } = req.body;
-  // Honeypot mot enkel spam
-  if (req.body.nettside) return res.redirect('/kontakt?sendt=1#skjema');
-  if (!navn || !melding || (!epost && !telefon)) {
-    return res.redirect('/kontakt?feil=1#skjema');
+  const manglar = [];
+  if (!verdiar.navn.trim()) manglar.push('navn');
+  if (!verdiar.melding.trim()) manglar.push('melding');
+  if (!verdiar.epost && !verdiar.telefon) manglar.push('kontakt');
+  if (verdiar.epost && !gyldigEpost(verdiar.epost)) manglar.push('epost');
+  if (verdiar.telefon && !gyldigTelefon(verdiar.telefon)) manglar.push('telefon');
+  if (manglar.length) {
+    hugsSkjema(res, verdiar);
+    return res.redirect('/kontakt?feil=' + encodeURIComponent(manglar.join('-')) + '#skjema');
   }
   try {
     await store.addMessage({
       id: crypto.randomUUID(),
       tid: new Date().toISOString(),
-      navn: String(navn).slice(0, 120),
-      epost: String(epost || '').slice(0, 160),
-      telefon: String(telefon || '').slice(0, 40),
-      tjeneste: String(tjeneste || '').slice(0, 80),
-      melding: String(melding).slice(0, 4000),
+      navn: verdiar.navn,
+      epost: verdiar.epost,
+      telefon: verdiar.telefon,
+      tjeneste: verdiar.tjeneste,
+      melding: verdiar.melding,
       lest: false,
     });
     res.redirect('/kontakt?sendt=1#skjema');
   } catch (e) {
     console.error('Klarte ikkje lagre melding:', e.message);
-    res.redirect('/kontakt?feil=1#skjema');
+    // Feilen er vår, ikkje kunden sin - ta vare på det han skreiv
+    hugsSkjema(res, verdiar);
+    res.redirect('/kontakt?feil=teknisk#skjema');
   }
 });
 

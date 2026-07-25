@@ -10,10 +10,16 @@
     "facebook": "https://www.facebook.com/eidmalerservice/",
     "instagram": "",
     "apningstider": [
-      { "dag": "Mandag – fredag", "tid": "07:00 – 15:30" },
-      { "dag": "Lørdag – søndag", "tid": "Stengt" }
+      {
+        "dag": "Mandag – fredag",
+        "tid": "07:00 – 15:30"
+      },
+      {
+        "dag": "Lørdag – søndag",
+        "tid": "Stengt"
+      }
     ],
-    "apningstiderNotat": "PLASSHALDAR – åpningstidene er ikke bekreftet av bedriften. Rediger eller fjern dem i admin.",
+    "apningstiderNotat": "PLASSHOLDER – åpningstidene er ikke bekreftet av bedriften. Rediger eller fjern dem i admin.",
     "apningstiderErPlassholder": true
   },
   "varsel": {
@@ -23,15 +29,24 @@
   },
   "forside": {
     "heroOvertittel": "Malerarbeid i Nordfjord siden 2008",
-    "heroTittel": "Vi gir rommet et finish som varer",
+    "heroTittel": "Vi gir rommet en finish som varer",
     "heroIngress": "Eid Malerservice er ti fagfolk med base i Nordfjordeid. Vi utfører alt innen malerfaget – innvendig og utvendig – for private og bedrifter, på nybygg og rehabilitering.",
     "heroCta": "Be om tilbud",
     "heroCtaSekundar": "Ring oss",
     "heroBilde": "fasade",
     "nokkeltall": [
-      { "tall": "2008", "tekst": "Drevet siden" },
-      { "tall": "10", "tekst": "Fagfolk på laget" },
-      { "tall": "6", "tekst": "Fagområder" }
+      {
+        "tall": "2008",
+        "tekst": "Drevet siden"
+      },
+      {
+        "tall": "10",
+        "tekst": "Fagfolk på laget"
+      },
+      {
+        "tall": "6",
+        "tekst": "Fagområder"
+      }
     ],
     "tjenesterTittel": "Dette gjør vi",
     "tjenesterIngress": "Store og små oppdrag, for private og bedrifter.",
@@ -55,12 +70,30 @@
     "fargeveggTittel": "Finn fargen",
     "fargeveggIngress": "Usikker på fargevalget? Vi hjelper deg med å velge. Prøv noen toner her – og ta praten med oss om resten.",
     "fargevegg": [
-      { "navn": "Kalket hvit", "hex": "#EFEAE1" },
-      { "navn": "Varm sand", "hex": "#D9C7AC" },
-      { "navn": "Salvie", "hex": "#9AA391" },
-      { "navn": "Djup mur", "hex": "#6E6862" },
-      { "navn": "Fjordblå", "hex": "#5C7385" },
-      { "navn": "Nattkull", "hex": "#2E2C29" }
+      {
+        "navn": "Kalket hvit",
+        "hex": "#EFEAE1"
+      },
+      {
+        "navn": "Varm sand",
+        "hex": "#D9C7AC"
+      },
+      {
+        "navn": "Salvie",
+        "hex": "#9AA391"
+      },
+      {
+        "navn": "Djup mur",
+        "hex": "#6E6862"
+      },
+      {
+        "navn": "Fjordblå",
+        "hex": "#5C7385"
+      },
+      {
+        "navn": "Nattkull",
+        "hex": "#2E2C29"
+      }
     ]
   },
   "tjenester": [
@@ -104,16 +137,30 @@
       "navn": "Industribelegg",
       "kort": "Slitesterke gulvbelegg for næringsbygg og verksted.",
       "tekst": "For næringsbygg, verksted og lager legger vi slitesterke industribelegg som tåler hard bruk, tunge maskiner og rengjøring.",
-      "bilde": "sproyting"
+      "bilde": ""
     }
   ],
   "galleri": [
-    { "bilde": "fasade", "tekst": "Fasadearbeid fra lift på næringsbygg" },
-    { "bilde": "laget", "tekst": "Deler av laget på et større næringsbyggprosjekt" },
-    { "bilde": "sproyting", "tekst": "Sprøyting av puss med maskin på næringsbygg" },
-    { "bilde": "innvendig", "tekst": "Innvendig maling av vegg" },
-    { "bilde": "golv", "tekst": "Sveising av skjøter i banebelegg" },
-    { "bilde": "pauserom", "tekst": "Pause på byggeplass" }
+    {
+      "bilde": "fasade",
+      "tekst": "Fasadearbeid fra lift på næringsbygg"
+    },
+    {
+      "bilde": "laget",
+      "tekst": "Deler av arbeidslaget på et større næringsbyggprosjekt"
+    },
+    {
+      "bilde": "innvendig",
+      "tekst": "Innvendig maling av vegg"
+    },
+    {
+      "bilde": "golv",
+      "tekst": "Sveising av skjøter i banebelegg"
+    },
+    {
+      "bilde": "sproyting",
+      "tekst": "Tre av malerne ved en pussemaskin på byggeplass"
+    }
   ],
   "omOss": {
     "tittel": "Om Eid Malerservice",

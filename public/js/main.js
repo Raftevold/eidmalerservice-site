@@ -38,6 +38,12 @@
         menyKnapp.focus();
       }
     });
+    // Klikk utanfor menyen skal òg lukke han
+    document.addEventListener('click', function (e) {
+      if (menyKnapp.getAttribute('aria-expanded') !== 'true') return;
+      if (nav.contains(e.target) || menyKnapp.contains(e.target)) return;
+      settOpen(false);
+    });
   }
 
   /* --- scroll-avsløring --- */

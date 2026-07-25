@@ -21,26 +21,58 @@
               <strong>Meldingen er sendt.</strong> <%= c.kontakt.takketekst %>
             </div>
           <% } %>
-          <% if (feil) { %>
+          <%
+            var feila = feilkode ? feilkode.split('-') : [];
+            var harFeil = function (n) { return feila.indexOf(n) !== -1; };
+          %>
+          <% if (feilkode === 'for-mange') { %>
             <div class="melding-boks melding-boks--feil" role="alert">
-              <strong>Noe manglet.</strong> Fyll inn navn, en melding og enten e-post eller telefon, og prøv igjen.
+              <strong>Du har sendt flere meldinger nettopp.</strong>
+              Vent litt før du sender en til – eller ring oss direkte på
+              <a href="<%= telefonLenke(c.bedrift.telefon) %>"><%= c.bedrift.telefon %></a>.
+              Det du skrev står fortsatt i skjemaet.
+            </div>
+          <% } else if (feilkode === 'teknisk') { %>
+            <div class="melding-boks melding-boks--feil" role="alert">
+              <strong>Noe gikk galt hos oss.</strong> Meldingen ble ikke sendt.
+              Prøv igjen om litt, eller ring oss på
+              <a href="<%= telefonLenke(c.bedrift.telefon) %>"><%= c.bedrift.telefon %></a>.
+              Det du skrev står fortsatt i skjemaet.
+            </div>
+          <% } else if (feil) { %>
+            <div class="melding-boks melding-boks--feil" role="alert">
+              <strong>Vi mangler noe før vi kan sende:</strong>
+              <ul class="feilliste">
+                <% if (harFeil('navn')) { %><li><a href="#navn">Fyll inn navnet ditt</a></li><% } %>
+                <% if (harFeil('melding')) { %><li><a href="#melding">Skriv noen ord om hva det gjelder</a></li><% } %>
+                <% if (harFeil('kontakt')) { %><li><a href="#epost">Fyll inn e-post eller telefon, så vi får svart deg</a></li><% } %>
+                <% if (harFeil('epost')) { %><li><a href="#epost">E-postadressen ser ikke riktig ut – sjekk at den inneholder @ og et punktum</a></li><% } %>
+                <% if (harFeil('telefon')) { %><li><a href="#telefon">Telefonnummeret ser ikke riktig ut – bruk bare tall</a></li><% } %>
+              </ul>
+              <span class="hint">Resten av det du skrev står fortsatt i skjemaet.</span>
             </div>
           <% } %>
 
-          <form class="skjema" method="post" action="/kontakt" novalidate>
+          <form class="skjema" method="post" action="/kontakt">
             <div class="felt">
               <label for="navn">Navn <span class="hint">(påkrevd)</span></label>
-              <input type="text" id="navn" name="navn" autocomplete="name" required maxlength="120">
+              <input type="text" id="navn" name="navn" autocomplete="name" required maxlength="120"
+                     value="<%= skjema.navn %>"
+                     <% if (harFeil('navn')) { %>aria-invalid="true" autofocus<% } %>>
             </div>
 
             <div class="felt">
               <label for="epost">E-post</label>
-              <input type="email" id="epost" name="epost" autocomplete="email" maxlength="160">
+              <input type="email" id="epost" name="epost" autocomplete="email" maxlength="160"
+                     value="<%= skjema.epost %>"
+                     <% if (harFeil('epost') || harFeil('kontakt')) { %>aria-invalid="true"<% } %>>
             </div>
 
             <div class="felt">
               <label for="telefon">Telefon</label>
-              <input type="tel" id="telefon" name="telefon" autocomplete="tel" maxlength="40">
+              <input type="tel" id="telefon" name="telefon" autocomplete="tel" maxlength="40"
+                     value="<%= skjema.telefon %>"
+                     <% if (harFeil('telefon') || harFeil('kontakt')) { %>aria-invalid="true"<% } %>>
               <span class="hint">Fyll inn e-post eller telefon, så vi får svart deg.</span>
             </div>
 
@@ -58,7 +90,8 @@
             <div class="felt">
               <label for="melding">Melding <span class="hint">(påkrevd)</span></label>
               <textarea id="melding" name="melding" required maxlength="4000"
-                        placeholder="Fortell kort om jobben – hva slags rom eller bygg, omtrentlig størrelse, og når du tenker det passer."></textarea>
+                        <% if (harFeil('melding')) { %>aria-invalid="true"<% } %>
+                        placeholder="Fortell kort om jobben – hva slags rom eller bygg, omtrentlig størrelse, og når du tenker det passer."><%= skjema.melding %></textarea>
             </div>
 
             <div class="felt felt--skjult" aria-hidden="true">
