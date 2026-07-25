@@ -496,7 +496,11 @@ a:hover { color: var(--kritt); }
   .nav a::after { display: none; }
   .meny-knapp { display: flex; }
   .topp__handling .knapp--liten { display: none; }
-  .tlf-lenke span { display: none; }
+  /* Skjul talet visuelt, men la det stå att for skjermlesarar */
+  .tlf-lenke span {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
   .tlf-lenke { width: 44px; height: 44px; justify-content: center; border: 1px solid var(--linje); border-radius: var(--rad); }
   .mobil-linje { display: flex; }
   .hero__tal { grid-template-columns: 1fr; }
